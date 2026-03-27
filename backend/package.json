@@ -1,0 +1,29 @@
+{
+  "name": "ui-component-library-backend",
+  "version": "1.0.0",
+  "description": "Backend for user personalization and component customization",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "kill-port 5004 && nodemon index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "theme",
+    "personalization",
+    "customization",
+    "ui-components"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2"
+  },
+  "devDependencies": {
+    "kill-port": "^2.0.1",
+    "nodemon": "^3.0.2"
+  }
+}

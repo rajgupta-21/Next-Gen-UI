@@ -1,0 +1,11 @@
+# Production frontend Dockerfile (Yarn-compatible)
+FROM node:20-alpine
+WORKDIR /app
+COPY package.json yarn.lock* ./
+RUN corepack enable && corepack yarn@stable install --frozen-lockfile
+COPY . .
+ENV NEXT_TELEMETRY_DISABLED=1
+ENV NODE_ENV=production
+RUN yarn build
+EXPOSE 3000
+CMD ["yarn", "start"]

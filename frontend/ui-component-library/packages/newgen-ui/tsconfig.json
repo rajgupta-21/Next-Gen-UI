@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "target": "ES2019",
+    "module": "ESNext",
+    "declaration": true,
+    "outDir": "dist",
+    "jsx": "react-jsx",
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "strict": false,
+    "moduleResolution": "node",
+    "lib": ["ES2019", "DOM", "DOM.Iterable"]
+  },
+  "include": ["src"]
+}

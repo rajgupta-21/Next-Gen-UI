@@ -1,0 +1,29 @@
+{
+  "name": "@your-scope/newgen-ui",
+  "version": "1.0.0",
+  "description": "A comprehensive UI component library built with React and TypeScript",
+  "author": "Your Name",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-org/your-repo"
+  },
+  "main": "dist/index.cjs.js",
+  "module": "dist/index.esm.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup src/index.ts --format cjs,esm --dts",
+    "test": "echo \"no tests\" && exit 0"
+  },
+  "peerDependencies": {
+    "react": "^18.0.0 || ^19.0.0",
+    "react-dom": "^18.0.0 || ^19.0.0"
+  },
+  "devDependencies": {
+    "tsup": "^6.0.0",
+    "typescript": "^5.0.0"
+  }
+}

@@ -1,0 +1,187 @@
+# UI Component Library Project Rules
+
+## Project Overview
+
+This is a comprehensive UI component library built with React 19, TypeScript, Next.js 15, and Tailwind CSS. The project contains:
+
+- **Main Application**: Next.js preview/documentation site at `/frontend/ui-component-library/`
+- **NPM Package**: Publishable component library at `/frontend/ui-component-library/packages/newgen-ui/`
+- **Backend**: Placeholder backend at `/backend/` with index.js
+
+## Architecture
+
+### Frontend Structure
+
+```
+frontend/ui-component-library/
+├── packages/newgen-ui/          # NPM publishable package
+│   ├── src/
+│   │   ├── components/          # 11 React components (Button, Card, Navbar, Carousel, Dialog, Dropdown, Input, Pagination, Progress, Tabs, ThemeProvider)
+│   │   └── index.ts             # Package exports
+│   ├── dist/                    # Build output (CJS, ESM, types)
+│   └── package.json             # NPM package config (@your-scope/newgen-ui v1.0.0)
+├── src/
+│   ├── app/                     # Next.js App Router
+│   │   ├── preview/             # Component previews (button/, card/, carousel/, etc.)
+│   │   ├── documentation/       # API docs
+│   │   ├── components/          # Components page
+│   │   └── page.tsx             # Home page
+│   ├── lib/ui/                  # Source components (Button.tsx, Card.tsx, etc.)
+│   ├── components/              # Page components (Navbar, ThemeSwitcher, etc.)
+│   └── const/                   # Constants
+└── public/                      # Static assets
+```
+
+### Components
+
+All 11 components are located in:
+
+- **Source**: `src/lib/ui/` (development)
+- **Package**: `packages/newgen-ui/src/components/` (distribution)
+
+Components:
+
+1. **Button** - ButtonProps, variants (solid, outline, ghost, gradient), sizes (sm, md, lg), loading state, icons
+2. **Card** - CardProps, variants (default, bordered, elevated, glass), title, description, footer
+3. **Navbar** - LibNavbarProps, brand customization, links array, gradient theme
+4. **Carousel** - CarouselProps, slides array, navigation buttons, indicators
+5. **Dialog** - DialogProps, modal dialog with overlay, close button, title
+6. **Dropdown** - DropdownProps, DropdownItem array, click handlers
+7. **Input** - InputProps, forwardRef, focus styles, theme-aware
+8. **Pagination** - PaginationProps, page calculation, navigation
+9. **Progress** - ProgressProps, value/max, variants (default, gradient, striped), animated
+10. **Tabs** - TabsProps, TabItem array, variants (default, pills, underline)
+11. **ThemeProvider** - ThemeConfig, CSS variables (--primary, --primary-600, --accent), RGB token exposure
+
+## Styling & Theming
+
+### Theme System
+
+- **CSS Variables**: `--primary`, `--primary-600`, `--accent`, `--mode`
+- **RGB Tokens**: `--primary-rgb`, `--accent-rgb` for gradient compatibility
+- **Tailwind CSS**: v4 with PostCSS
+- **Dark Mode**: Supported via `dark:` class variants
+
+### Color System
+
+- Primary color: #3b82f6 (blue) by default
+- Customizable via ThemeProvider or inline theme props
+- All components accept `theme` prop for dynamic styling
+
+## Build & Package
+
+### Development
+
+- `npm run dev` - Next.js dev server (localhost:3000)
+- `npm run lint` - ESLint
+- `npm run build` - Next.js production build
+- `npm run build-package` - Build npm package (tsup)
+
+### NPM Package
+
+- **Build Tool**: tsup v6
+- **Output Formats**: CommonJS (.js), ES Modules (.mjs), TypeScript Definitions (.d.ts)
+- **Peer Dependencies**: React 18+ || 19+, React-DOM 18+ || 19+
+- **Package Config**: v1.0.0, @your-scope/newgen-ui (placeholder scope)
+
+## Key Technologies
+
+- **Framework**: Next.js 15.5.4, React 19.1.0
+- **Language**: TypeScript 5
+- **Styling**: Tailwind CSS 4, PostCSS 4
+- **Build**: tsup (for npm package), Next.js bundler
+- **Linting**: ESLint 9
+- **Node Typing**: @types/node 20
+- **React Types**: @types/react 19, @types/react-dom 19
+
+## Important Guidelines
+
+### When Adding Components
+
+1. Create in `src/lib/ui/ComponentName.tsx`
+2. Export types and component
+3. Create `.stories.tsx` file for Storybook
+4. Create preview page in `src/app/preview/component-name/page.tsx`
+5. Copy to `packages/newgen-ui/src/components/` after testing
+6. Update `packages/newgen-ui/src/index.ts` exports
+
+### When Modifying Components
+
+- Maintain backward compatibility with props
+- Update both locations: `src/lib/ui/` AND `packages/newgen-ui/src/components/`
+- Test in preview page before publishing
+- Ensure theme prop is optional
+
+### TypeScript Rules
+
+- Use React.ReactNode for JSX content
+- Use forwardRef for Input (custom form input)
+- Export types for all Props interfaces
+- Set `strict: false` in package tsconfig for DOM compatibility
+
+### Package Publishing
+
+- Increment version in `packages/newgen-ui/package.json`
+- Run `npm run build-package` to generate dist files
+- Verify CJS, ESM, and type definitions
+- Update `@your-scope` with actual npm scope before publishing
+
+## File Patterns
+
+### Component Files
+
+- `components/ComponentName.tsx` - Main component
+- `components/ComponentName.stories.tsx` - Storybook stories
+- `app/preview/component-name/page.tsx` - Preview page
+
+### Config Files
+
+- `tsconfig.json` - TypeScript configuration
+- `next.config.ts` - Next.js configuration
+- `tailwind.config.ts` - Tailwind configuration
+- `package.json` - Dependencies and scripts
+- `.cursorrules` - This file (Claude context)
+
+## Common Tasks
+
+### Run Development
+
+```bash
+cd frontend/ui-component-library
+npm run dev
+# Visit http://localhost:3000
+```
+
+### Build NPM Package
+
+```bash
+cd frontend/ui-component-library/packages/newgen-ui
+npm run build
+# Outputs to dist/ with CJS, ESM, and .d.ts
+```
+
+### Add New Component
+
+1. Create `src/lib/ui/NewComponent.tsx`
+2. Create preview at `src/app/preview/new-component/page.tsx`
+3. Copy to `packages/newgen-ui/src/components/NewComponent.tsx`
+4. Update exports in `packages/newgen-ui/src/index.ts`
+
+### Customize Theme
+
+Use ThemeProvider at app root:
+
+```tsx
+<ThemeProvider theme={{ primary: "#7c3aed", primary600: "#6d28d9" }}>
+  <YourApp />
+</ThemeProvider>
+```
+
+## Notes for Claude
+
+- This is a professional UI library with dual sources (dev + distribution)
+- Maintain consistency between src/lib/ui/ and packages/newgen-ui/src/components/
+- Always test in preview pages before finalizing
+- Components should be framework-agnostic where possible (Navbar removed Next.js Link dependency)
+- Theme system allows customization via props or CSS variables
+- Tailwind dark mode is fully supported

@@ -11,6 +11,11 @@ const About = () => {
           customized, allowing you to build beautiful and consistent user
           interfaces with minimal effort.
         </p>
+        <p className="text-gray-300 mb-6 leading-relaxed">
+          New for this release: the Website Builder includes a real-time Netlify
+          deployment workflow. Build visually, then deploy instantly with a
+          token so your UI is live in seconds.
+        </p>
         <div className="flex items-center gap-6 flex-wrap">
           <div className="flex flex-col items-center gap-2">
             <div className="w-16 h-16 rounded-lg bg-gradient-to-br from-purple-600 to-indigo-600 flex items-center justify-center font-bold text-white text-2xl shadow-lg">

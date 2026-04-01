@@ -17,8 +17,8 @@ export default function TabsPreview() {
     return `{{ ${entries.join(", ")} } as React.CSSProperties}`;
   }
 
-  const exportCode = `import React from 'react';\nimport { Tabs } from '@your-scope/newgen-ui';\n\nexport default function CustomTabs(){\n  return <div style=${toStyleObjectString(
-    vars
+  const exportCode = `import React from 'react';\nimport { Tabs } from '@rajgupta2509/next-gen-builder';\n\nexport default function CustomTabs(){\n  return <div style=${toStyleObjectString(
+    vars,
   )}><Tabs items={tabs} /></div>\n}`;
 
   return (
@@ -83,9 +83,9 @@ export default function TabsPreview() {
         <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">
           Usage
         </h3>
-        <CodeBlock 
-          code={`import { Tabs } from '@your-scope/newgen-ui';\n\nconst tabs = [\n  { id: "tab1", label: "Tab 1", content: <p>Content 1</p> },\n  { id: "tab2", label: "Tab 2", content: <p>Content 2</p> },\n];\n\n// Basic usage\n<Tabs items={tabs} />\n\n// Pills variant\n<Tabs items={tabs} variant="pills" />\n\n// Underline variant\n<Tabs items={tabs} variant="underline" />\n\n// Different sizes\n<Tabs items={tabs} size="sm" />\n<Tabs items={tabs} size="md" />\n<Tabs items={tabs} size="lg" />\n\n// Custom theme\n<Tabs \n  items={tabs} \n  theme={{ primary: "#10b981", primary600: "#059669" }}\n/>\n\n// With default tab and onChange\n<Tabs \n  items={tabs} \n  defaultTab="tab2"\n  onChange={(tabId) => console.log(tabId)}\n/>`} 
-          language="jsx" 
+        <CodeBlock
+          code={`import { Tabs } from '@rajgupta2509/next-gen-builder';\n\nconst tabs = [\n  { id: "tab1", label: "Tab 1", content: <p>Content 1</p> },\n  { id: "tab2", label: "Tab 2", content: <p>Content 2</p> },\n];\n\n// Basic usage\n<Tabs items={tabs} />\n\n// Pills variant\n<Tabs items={tabs} variant="pills" />\n\n// Underline variant\n<Tabs items={tabs} variant="underline" />\n\n// Different sizes\n<Tabs items={tabs} size="sm" />\n<Tabs items={tabs} size="md" />\n<Tabs items={tabs} size="lg" />\n\n// Custom theme\n<Tabs \n  items={tabs} \n  theme={{ primary: "#10b981", primary600: "#059669" }}\n/>\n\n// With default tab and onChange\n<Tabs \n  items={tabs} \n  defaultTab="tab2"\n  onChange={(tabId) => console.log(tabId)}\n/>`}
+          language="jsx"
         />
       </div>
 

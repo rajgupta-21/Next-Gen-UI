@@ -1,5 +1,40 @@
+var __defProp = Object.defineProperty;
+var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
+var __getOwnPropNames = Object.getOwnPropertyNames;
+var __hasOwnProp = Object.prototype.hasOwnProperty;
+var __export = (target, all) => {
+  for (var name in all)
+    __defProp(target, name, { get: all[name], enumerable: true });
+};
+var __copyProps = (to, from, except, desc) => {
+  if (from && typeof from === "object" || typeof from === "function") {
+    for (let key of __getOwnPropNames(from))
+      if (!__hasOwnProp.call(to, key) && key !== except)
+        __defProp(to, key, { get: () => from[key], enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable });
+  }
+  return to;
+};
+var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
+
+// src/index.ts
+var src_exports = {};
+__export(src_exports, {
+  Button: () => Button,
+  Card: () => Card,
+  Carousel: () => Carousel,
+  Dialog: () => Dialog,
+  Dropdown: () => Dropdown,
+  Input: () => Input_default,
+  Navbar: () => LibNavbar,
+  Pagination: () => Pagination,
+  Progress: () => Progress,
+  Tabs: () => Tabs,
+  ThemeProvider: () => ThemeProvider
+});
+module.exports = __toCommonJS(src_exports);
+
 // src/components/Button.tsx
-import { jsx, jsxs } from "react/jsx-runtime";
+var import_jsx_runtime = require("react/jsx-runtime");
 function Button({
   children,
   variant = "solid",
@@ -53,7 +88,7 @@ function Button({
     ${variantClasses}
     ${className}
   `.trim().replace(/\s+/g, " ");
-  return /* @__PURE__ */ jsxs(
+  return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(
     "button",
     {
       className: buttonClasses,
@@ -61,7 +96,7 @@ function Button({
       disabled: disabled || isLoading,
       ...rest,
       children: [
-        isLoading ? /* @__PURE__ */ jsxs(
+        isLoading ? /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(
           "svg",
           {
             className: "animate-spin h-4 w-4",
@@ -69,7 +104,7 @@ function Button({
             fill: "none",
             viewBox: "0 0 24 24",
             children: [
-              /* @__PURE__ */ jsx(
+              /* @__PURE__ */ (0, import_jsx_runtime.jsx)(
                 "circle",
                 {
                   className: "opacity-25",
@@ -80,7 +115,7 @@ function Button({
                   strokeWidth: "4"
                 }
               ),
-              /* @__PURE__ */ jsx(
+              /* @__PURE__ */ (0, import_jsx_runtime.jsx)(
                 "path",
                 {
                   className: "opacity-75",
@@ -99,7 +134,7 @@ function Button({
 }
 
 // src/components/Card.tsx
-import { jsx as jsx2, jsxs as jsxs2 } from "react/jsx-runtime";
+var import_jsx_runtime2 = require("react/jsx-runtime");
 function Card({
   title,
   description,
@@ -166,23 +201,23 @@ function Card({
     ${variantClasses}
     ${className}
   `.trim().replace(/\s+/g, " ");
-  return /* @__PURE__ */ jsxs2("div", { className: cardClasses, style: getCardStyle(), ...rest, children: [
-    title && /* @__PURE__ */ jsx2("h3", { className: "text-xl font-semibold mb-2 text-gray-900 dark:text-gray-100", children: title }),
-    description && /* @__PURE__ */ jsx2("p", { className: "text-sm text-gray-600 dark:text-gray-400 mb-4", children: description }),
-    /* @__PURE__ */ jsx2("div", { className: "text-gray-700 dark:text-gray-300", children }),
-    footer && /* @__PURE__ */ jsx2("div", { className: "mt-4 pt-4 border-t border-gray-200 dark:border-gray-700 text-sm text-gray-600 dark:text-gray-400", children: footer })
+  return /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: cardClasses, style: getCardStyle(), ...rest, children: [
+    title && /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("h3", { className: "text-xl font-semibold mb-2 text-gray-900 dark:text-gray-100", children: title }),
+    description && /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("p", { className: "text-sm text-white dark:text-gray-400 mb-4", children: description }),
+    /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "text-white dark:text-gray-300", children }),
+    footer && /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "mt-4 pt-4 border-t border-gray-200 dark:border-gray-700 text-sm text-gray-600 dark:text-gray-400", children: footer })
   ] });
 }
 
 // src/components/Carousel.tsx
-import { useState } from "react";
-import { jsx as jsx3, jsxs as jsxs3 } from "react/jsx-runtime";
+var import_react = require("react");
+var import_jsx_runtime3 = require("react/jsx-runtime");
 function Carousel({
   slides,
   theme,
   className = ""
 }) {
-  const [currentIndex, setCurrentIndex] = useState(0);
+  const [currentIndex, setCurrentIndex] = (0, import_react.useState)(0);
   const nextSlide = () => setCurrentIndex((prev) => (prev + 1) % slides.length);
   const prevSlide = () => setCurrentIndex((prev) => (prev - 1 + slides.length) % slides.length);
   const containerStyle = {
@@ -191,21 +226,21 @@ function Carousel({
   const indicatorStyle = (isActive) => ({
     backgroundColor: isActive ? (theme == null ? void 0 : theme.indicator) || "var(--carousel-indicator, #7C3AED)" : (theme == null ? void 0 : theme.inactiveIndicator) || "var(--carousel-inactive-indicator, #999999)"
   });
-  return /* @__PURE__ */ jsxs3(
+  return /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)(
     "div",
     {
       className: `relative w-full overflow-hidden rounded-xl ${className}`,
       style: containerStyle,
       children: [
-        /* @__PURE__ */ jsx3(
+        /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
           "div",
           {
             className: "flex transition-transform duration-500",
             style: { transform: `translateX(-${currentIndex * 100}%)` },
-            children: slides.map((slide, index) => /* @__PURE__ */ jsx3("div", { className: "w-full flex-shrink-0", children: slide }, index))
+            children: slides.map((slide, index) => /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("div", { className: "w-full flex-shrink-0", children: slide }, index))
           }
         ),
-        /* @__PURE__ */ jsx3(
+        /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
           "button",
           {
             onClick: prevSlide,
@@ -213,7 +248,7 @@ function Carousel({
             children: "\u2039"
           }
         ),
-        /* @__PURE__ */ jsx3(
+        /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
           "button",
           {
             onClick: nextSlide,
@@ -221,7 +256,7 @@ function Carousel({
             children: "\u203A"
           }
         ),
-        /* @__PURE__ */ jsx3("div", { className: "absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-2", children: slides.map((_, idx) => /* @__PURE__ */ jsx3(
+        /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("div", { className: "absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-2", children: slides.map((_, idx) => /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
           "span",
           {
             className: "w-3 h-3 rounded-full cursor-pointer transition-colors",
@@ -236,7 +271,7 @@ function Carousel({
 }
 
 // src/components/Dialog.tsx
-import { jsx as jsx4, jsxs as jsxs4 } from "react/jsx-runtime";
+var import_jsx_runtime4 = require("react/jsx-runtime");
 function Dialog({
   open,
   onClose,
@@ -255,20 +290,20 @@ function Dialog({
     borderTop: `5px solid ${(theme == null ? void 0 : theme.primary) || "var(--primary, #3b82f6)"}`,
     color: "var(--dialog-text, #111111)"
   };
-  return /* @__PURE__ */ jsx4(
+  return /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
     "div",
     {
       className: "fixed inset-0 flex items-center justify-center z-50",
       style: overlayStyle,
       onClick: onClose,
-      children: /* @__PURE__ */ jsxs4(
+      children: /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)(
         "div",
         {
           className: `bg-white rounded-lg shadow-lg max-w-md p-6 relative ${className}`,
           style: dialogStyle,
           onClick: (e) => e.stopPropagation(),
           children: [
-            /* @__PURE__ */ jsx4(
+            /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
               "button",
               {
                 onClick: onClose,
@@ -276,8 +311,8 @@ function Dialog({
                 children: "\u2715"
               }
             ),
-            title && /* @__PURE__ */ jsx4("h2", { className: "text-xl font-semibold mb-3", children: title }),
-            /* @__PURE__ */ jsx4("div", { children })
+            title && /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("h2", { className: "text-xl font-semibold mb-3", children: title }),
+            /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("div", { children })
           ]
         }
       )
@@ -286,15 +321,15 @@ function Dialog({
 }
 
 // src/components/Dropdown.tsx
-import { useState as useState2 } from "react";
-import { jsx as jsx5, jsxs as jsxs5 } from "react/jsx-runtime";
+var import_react2 = require("react");
+var import_jsx_runtime5 = require("react/jsx-runtime");
 function Dropdown({
   label,
   items,
   theme,
   className = ""
 }) {
-  const [open, setOpen] = useState2(false);
+  const [open, setOpen] = (0, import_react2.useState)(false);
   const dropdownStyle = {
     background: (theme == null ? void 0 : theme.background) || "var(--dropdown-bg, #ffffff)",
     color: (theme == null ? void 0 : theme.text) || "var(--dropdown-text, #111111)",
@@ -308,8 +343,8 @@ function Dropdown({
     color: (theme == null ? void 0 : theme.text) || "var(--dropdown-text, #111111)",
     background: isHover ? (theme == null ? void 0 : theme.hover) || "var(--dropdown-hover, #f0f0f0)" : (theme == null ? void 0 : theme.background) || "var(--dropdown-bg, #ffffff)"
   });
-  return /* @__PURE__ */ jsxs5("div", { className: `relative inline-block w-48 ${className}`, children: [
-    /* @__PURE__ */ jsxs5(
+  return /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { className: `relative inline-block w-48 ${className}`, children: [
+    /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)(
       "button",
       {
         onClick: () => setOpen(!open),
@@ -317,16 +352,16 @@ function Dropdown({
         style: dropdownStyle,
         children: [
           label,
-          /* @__PURE__ */ jsx5("span", { className: "float-right", children: "\u25BC" })
+          /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("span", { className: "float-right", children: "\u25BC" })
         ]
       }
     ),
-    open && /* @__PURE__ */ jsx5(
+    open && /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(
       "div",
       {
         className: "absolute left-0 mt-2 w-full rounded-lg shadow-lg z-50",
         style: menuStyle,
-        children: items.map((item, idx) => /* @__PURE__ */ jsx5(
+        children: items.map((item, idx) => /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(
           "div",
           {
             className: "px-4 py-2 cursor-pointer transition-colors",
@@ -352,9 +387,9 @@ function Dropdown({
 }
 
 // src/components/Input.tsx
-import { forwardRef } from "react";
-import { jsx as jsx6 } from "react/jsx-runtime";
-var Input = forwardRef(
+var import_react3 = require("react");
+var import_jsx_runtime6 = require("react/jsx-runtime");
+var Input = (0, import_react3.forwardRef)(
   ({ theme, className = "", ...props }, ref) => {
     const inputStyle = {
       backgroundColor: (theme == null ? void 0 : theme.background) || "var(--input-bg, #ffffff)",
@@ -365,7 +400,7 @@ var Input = forwardRef(
       borderColor: (theme == null ? void 0 : theme.primary) || "var(--primary, #3b82f6)",
       boxShadow: `0 0 0 3px ${(theme == null ? void 0 : theme.primary) ? `${theme.primary}20` : "var(--primary-shadow, rgba(59, 130, 246, 0.1))"}`
     };
-    return /* @__PURE__ */ jsx6(
+    return /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(
       "input",
       {
         ref,
@@ -387,11 +422,11 @@ Input.displayName = "Input";
 var Input_default = Input;
 
 // src/components/Navbar.tsx
-import { jsx as jsx7, jsxs as jsxs6 } from "react/jsx-runtime";
+var import_jsx_runtime7 = require("react/jsx-runtime");
 function LibNavbar({
-  brand = /* @__PURE__ */ jsxs6("div", { className: "flex items-center gap-3", children: [
-    /* @__PURE__ */ jsx7("div", { className: "w-8 h-8 rounded-md bg-[var(--primary)] flex items-center justify-center text-white font-bold", children: "R" }),
-    /* @__PURE__ */ jsx7("div", { children: /* @__PURE__ */ jsx7("div", { className: "font-semibold", children: "NewGen UI" }) })
+  brand = /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("div", { className: "flex items-center gap-3", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("div", { className: "w-8 h-8 rounded-md bg-[var(--primary)] flex items-center justify-center text-white font-bold", children: "R" }),
+    /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("div", { children: /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("div", { className: "font-semibold", children: "NewGen UI" }) })
   ] }),
   links = [
     { href: "/", label: "Home" },
@@ -404,14 +439,14 @@ function LibNavbar({
   const navStyle = {
     background: (theme == null ? void 0 : theme.primary) && (theme == null ? void 0 : theme.primary600) ? `linear-gradient(90deg, ${theme.primary}, ${theme.primary600})` : "linear-gradient(90deg, var(--primary, #3b82f6), var(--primary-600, #2563eb))"
   };
-  return /* @__PURE__ */ jsx7("nav", { className: `w-full py-3 ${className}`, style: navStyle, children: /* @__PURE__ */ jsxs6("div", { className: "container-max px-4 flex items-center justify-between", children: [
-    /* @__PURE__ */ jsx7("div", { children: brand }),
-    /* @__PURE__ */ jsx7("div", { className: "hidden sm:flex gap-3", children: links.map((l, i) => /* @__PURE__ */ jsx7(
+  return /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("nav", { className: `w-full py-3 ${className}`, style: navStyle, children: /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("div", { className: "container-max px-4 flex items-center justify-between", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("div", { children: brand }),
+    /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("div", { className: "hidden sm:flex gap-3", children: links.map((l, i) => /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(
       "a",
       {
         href: l.href || "/",
         className: "nav-link",
-        children: /* @__PURE__ */ jsx7(
+        children: /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(
           "span",
           {
             style: {
@@ -430,7 +465,7 @@ function LibNavbar({
 }
 
 // src/components/Pagination.tsx
-import { jsx as jsx8, jsxs as jsxs7 } from "react/jsx-runtime";
+var import_jsx_runtime8 = require("react/jsx-runtime");
 function Pagination({
   currentPage,
   totalPages,
@@ -460,8 +495,8 @@ function Pagination({
     opacity: 0.5,
     cursor: "not-allowed"
   };
-  return /* @__PURE__ */ jsxs7("div", { className: `flex items-center justify-center space-x-2 ${className}`, children: [
-    /* @__PURE__ */ jsx8(
+  return /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { className: `flex items-center justify-center space-x-2 ${className}`, children: [
+    /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(
       "button",
       {
         onClick: () => onPageChange(currentPage - 1),
@@ -474,7 +509,7 @@ function Pagination({
         children: "Previous"
       }
     ),
-    getPageNumbers().map((page) => /* @__PURE__ */ jsx8(
+    getPageNumbers().map((page) => /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(
       "button",
       {
         onClick: () => onPageChange(page),
@@ -484,7 +519,7 @@ function Pagination({
       },
       page
     )),
-    /* @__PURE__ */ jsx8(
+    /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(
       "button",
       {
         onClick: () => onPageChange(currentPage + 1),
@@ -501,7 +536,7 @@ function Pagination({
 }
 
 // src/components/Progress.tsx
-import { jsx as jsx9, jsxs as jsxs8 } from "react/jsx-runtime";
+var import_jsx_runtime9 = require("react/jsx-runtime");
 function Progress({
   value,
   max = 100,
@@ -537,8 +572,8 @@ function Progress({
     return baseStyle;
   };
   const barClasses = `h-full transition-all duration-300 ease-in-out rounded-full ${variant === "striped" ? "bg-gradient-to-r from-transparent via-white/20 to-transparent bg-[length:30px_100%]" : ""} ${animated && variant === "striped" ? "animate-pulse" : ""}`.trim();
-  return /* @__PURE__ */ jsxs8("div", { className: "w-full", children: [
-    /* @__PURE__ */ jsx9("div", { className: containerClasses, ...rest, children: /* @__PURE__ */ jsx9("div", { className: barClasses, style: getBarStyle(), children: variant === "striped" && /* @__PURE__ */ jsx9(
+  return /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)("div", { className: "w-full", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("div", { className: containerClasses, ...rest, children: /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("div", { className: barClasses, style: getBarStyle(), children: variant === "striped" && /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(
       "div",
       {
         className: "absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent",
@@ -548,11 +583,11 @@ function Progress({
         }
       }
     ) }) }),
-    showLabel && /* @__PURE__ */ jsxs8("div", { className: "mt-1 text-xs text-gray-600 dark:text-gray-400 text-right", children: [
+    showLabel && /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)("div", { className: "mt-1 text-xs text-gray-600 dark:text-gray-400 text-right", children: [
       percentage.toFixed(0),
       "%"
     ] }),
-    /* @__PURE__ */ jsx9("style", { children: `
+    /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("style", { children: `
         @keyframes progress-stripes {
           0% {
             background-position: 0 0;
@@ -566,8 +601,8 @@ function Progress({
 }
 
 // src/components/Tabs.tsx
-import { useState as useState3 } from "react";
-import { jsx as jsx10, jsxs as jsxs9 } from "react/jsx-runtime";
+var import_react4 = require("react");
+var import_jsx_runtime10 = require("react/jsx-runtime");
 function Tabs({
   items = [],
   defaultTab,
@@ -578,7 +613,7 @@ function Tabs({
   theme
 }) {
   var _a, _b;
-  const [activeTab, setActiveTab] = useState3(defaultTab || ((_a = items[0]) == null ? void 0 : _a.id));
+  const [activeTab, setActiveTab] = (0, import_react4.useState)(defaultTab || ((_a = items[0]) == null ? void 0 : _a.id));
   const handleTabChange = (tabId) => {
     const tab = items.find((item) => item.id === tabId);
     if (tab == null ? void 0 : tab.disabled)
@@ -624,8 +659,8 @@ function Tabs({
     underline: "flex gap-4 border-b border-gray-200 dark:border-gray-700"
   }[variant];
   const activeContent = (_b = items.find((item) => item.id === activeTab)) == null ? void 0 : _b.content;
-  return /* @__PURE__ */ jsxs9("div", { className: `w-full ${className}`, children: [
-    /* @__PURE__ */ jsx10("div", { className: tabListClasses, role: "tablist", children: items.map((item) => /* @__PURE__ */ jsx10(
+  return /* @__PURE__ */ (0, import_jsx_runtime10.jsxs)("div", { className: `w-full ${className}`, children: [
+    /* @__PURE__ */ (0, import_jsx_runtime10.jsx)("div", { className: tabListClasses, role: "tablist", children: items.map((item) => /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(
       "button",
       {
         role: "tab",
@@ -642,12 +677,12 @@ function Tabs({
       },
       item.id
     )) }),
-    /* @__PURE__ */ jsx10("div", { className: "mt-4", role: "tabpanel", children: activeContent })
+    /* @__PURE__ */ (0, import_jsx_runtime10.jsx)("div", { className: "mt-4", role: "tabpanel", children: activeContent })
   ] });
 }
 
 // src/components/ThemeProvider.tsx
-import { jsx as jsx11 } from "react/jsx-runtime";
+var import_jsx_runtime11 = require("react/jsx-runtime");
 function ThemeProvider({
   theme,
   children
@@ -683,18 +718,20 @@ function ThemeProvider({
     const b = num & 255;
     style["--accent-rgb"] = `${r}, ${g}, ${b}`;
   }
-  return /* @__PURE__ */ jsx11("div", { style, children });
+  return /* @__PURE__ */ (0, import_jsx_runtime11.jsx)("div", { style, children });
 }
-export {
+// Annotate the CommonJS export names for ESM import in node:
+0 && (module.exports = {
   Button,
   Card,
   Carousel,
   Dialog,
   Dropdown,
-  Input_default as Input,
-  LibNavbar as Navbar,
+  Input,
+  Navbar,
   Pagination,
   Progress,
   Tabs,
   ThemeProvider
-};
+});
+//# sourceMappingURL=index.cjs.map

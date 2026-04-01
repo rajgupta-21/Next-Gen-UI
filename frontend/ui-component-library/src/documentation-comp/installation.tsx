@@ -11,9 +11,9 @@ const Installation = () => {
           manager.
         </p>
         <CodeSnippet language="bash">
-          {`npm install @your-scope/newgen-ui
+          {`npm install @rajgupta2509/next-gen-builder
 # or
-yarn add @your-scope/newgen-ui`}
+yarn add @rajgupta2509/next-gen-builder`}
         </CodeSnippet>
       </div>
     </section>

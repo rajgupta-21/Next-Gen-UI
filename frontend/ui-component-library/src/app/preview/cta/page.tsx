@@ -134,9 +134,9 @@ export default function CTA() {
           {/* Usage */}
           <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl shadow-2xl p-6 md:p-8 border border-blue-500/30 backdrop-blur-sm">
             <h3 className="text-xl font-bold text-white mb-4">💻 Usage</h3>
-            <CodeBlock 
-              code={`import { CTA } from '@your-scope/newgen-ui';\n\n// Basic CTA\n<CTA \n  title="Ready to Get Started?"\n  subtitle="Join our community"\n/>\n\n// Custom CTA with colors\n<CTA \n  title="Try for Free"\n  subtitle="No credit card required"\n  bgColor="#10B981"\n  textColor="#FFFFFF"\n/>\n\n// CTA with custom button\n<CTA title="Get Started" subtitle="Join us today">\n  <button>Start Free Trial</button>\n</CTA>`} 
-              language="jsx" 
+            <CodeBlock
+              code={`import { CTA } from '@rajgupta2509/next-gen-builder';\n\n// Basic CTA\n<CTA \n  title="Ready to Get Started?"\n  subtitle="Join our community"\n/>\n\n// Custom CTA with colors\n<CTA \n  title="Try for Free"\n  subtitle="No credit card required"\n  bgColor="#10B981"\n  textColor="#FFFFFF"\n/>\n\n// CTA with custom button\n<CTA title="Get Started" subtitle="Join us today">\n  <button>Start Free Trial</button>\n</CTA>`}
+              language="jsx"
             />
           </div>
 

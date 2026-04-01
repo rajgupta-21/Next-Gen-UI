@@ -107,9 +107,9 @@ export default function Testimonial() {
           {/* Usage */}
           <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl shadow-2xl p-6 md:p-8 border border-blue-500/30 backdrop-blur-sm">
             <h3 className="text-xl font-bold text-white mb-4">💻 Usage</h3>
-            <CodeBlock 
-              code={`import { Testimonial } from '@your-scope/newgen-ui';\n\n// Basic usage\n<Testimonial \n  name="John Doe"\n  title="CEO at Company"\n  content="Great product!"\n/>\n\n// With custom background\n<Testimonial \n  name="Sarah Johnson"\n  title="Product Manager"\n  content="This transformed our workflow"\n  bgColor="#F9FAFB"\n/>\n\n// Multiple testimonials in grid\n<div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '1.5rem' }}>\n  <Testimonial name="User 1" title="Role 1" content="Feedback 1" />\n  <Testimonial name="User 2" title="Role 2" content="Feedback 2" />\n  <Testimonial name="User 3" title="Role 3" content="Feedback 3" />\n</div>`} 
-              language="jsx" 
+            <CodeBlock
+              code={`import { Testimonial } from '@rajgupta2509/next-gen-builder';\n\n// Basic usage\n<Testimonial \n  name="John Doe"\n  title="CEO at Company"\n  content="Great product!"\n/>\n\n// With custom background\n<Testimonial \n  name="Sarah Johnson"\n  title="Product Manager"\n  content="This transformed our workflow"\n  bgColor="#F9FAFB"\n/>\n\n// Multiple testimonials in grid\n<div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '1.5rem' }}>\n  <Testimonial name="User 1" title="Role 1" content="Feedback 1" />\n  <Testimonial name="User 2" title="Role 2" content="Feedback 2" />\n  <Testimonial name="User 3" title="Role 3" content="Feedback 3" />\n</div>`}
+              language="jsx"
             />
           </div>
 

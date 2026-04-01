@@ -12,8 +12,8 @@ export default function InputPreview() {
     return `{{ ${entries.join(", ")} } as React.CSSProperties}`;
   }
 
-  const exportCode = `import React, { useState } from 'react';\nimport { Input } from '@your-scope/newgen-ui';\n\nexport default function CustomInput(){\n  const [value, setValue] = useState('');\n  return <div style=${toStyleObjectString(
-    vars
+  const exportCode = `import React, { useState } from 'react';\nimport { Input } from '@rajgupta2509/next-gen-builder';\n\nexport default function CustomInput(){\n  const [value, setValue] = useState('');\n  return <div style=${toStyleObjectString(
+    vars,
   )}><Input value={value} onChange={(e) => setValue(e.target.value)} placeholder="Enter text..." /></div>\n}`;
 
   return (
@@ -159,9 +159,9 @@ export default function InputPreview() {
         <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">
           Usage
         </h3>
-        <CodeBlock 
-          code={`import { Input } from '@your-scope/newgen-ui';\n\n// Basic usage\n<Input \n  value={value} \n  onChange={(e) => setValue(e.target.value)} \n  placeholder="Enter text..." \n/>\n\n// Custom theme\n<Input \n  value={value} \n  onChange={(e) => setValue(e.target.value)} \n  placeholder="Custom input..."\n  theme={{\n    background: "#f8f9fa",\n    text: "#495057",\n    border: "#10b981"\n  }}\n/>\n\n// Different types\n<Input type="email" placeholder="Email" />\n<Input type="password" placeholder="Password" />\n<Input type="number" placeholder="Number" />\n\n// With validation\n<Input \n  type="email" \n  required \n  placeholder="Email" \n  className="w-full" \n/>`} 
-          language="jsx" 
+        <CodeBlock
+          code={`import { Input } from '@rajgupta2509/next-gen-builder';\n\n// Basic usage\n<Input \n  value={value} \n  onChange={(e) => setValue(e.target.value)} \n  placeholder="Enter text..." \n/>\n\n// Custom theme\n<Input \n  value={value} \n  onChange={(e) => setValue(e.target.value)} \n  placeholder="Custom input..."\n  theme={{\n    background: "#f8f9fa",\n    text: "#495057",\n    border: "#10b981"\n  }}\n/>\n\n// Different types\n<Input type="email" placeholder="Email" />\n<Input type="password" placeholder="Password" />\n<Input type="number" placeholder="Number" />\n\n// With validation\n<Input \n  type="email" \n  required \n  placeholder="Email" \n  className="w-full" \n/>`}
+          language="jsx"
         />
       </div>
 

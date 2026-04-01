@@ -162,6 +162,11 @@ export default function Home() {
                 without code. Real-time preview, component customization, and
                 export as React or HTML.
               </p>
+              <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed mb-4 font-semibold">
+                New: One-click Netlify deployment directly from the builder.
+                Generate your website, provide your Netlify token, and go live
+                instantly.
+              </p>
               <Link
                 href="/website-builder"
                 className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white text-sm font-semibold inline-flex items-center gap-2"

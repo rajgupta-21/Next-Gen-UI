@@ -1,7 +1,7 @@
 // frontend/ui-component-library/src/hooks/useUserTheme.ts
 // React hook to manage user theme from backend
 
-import type { ThemeConfig } from "@your-scope/newgen-ui";
+import type { ThemeConfig } from "@rajgupta2509/next-gen-builder";
 import { useEffect, useState } from "react";
 
 interface UserTheme extends ThemeConfig {
@@ -61,12 +61,12 @@ export function useUserTheme({
                     lineHeight: 1.5,
                   },
                 }),
-              }
+              },
             );
 
             if (!createRes.ok) {
               throw new Error(
-                `Failed to create default theme: ${createRes.statusText}`
+                `Failed to create default theme: ${createRes.statusText}`,
               );
             }
 
@@ -121,19 +121,19 @@ export function useUserTheme({
       if (themeData.typography.fontFamily) {
         root.style.setProperty(
           "--font-family",
-          themeData.typography.fontFamily
+          themeData.typography.fontFamily,
         );
       }
       if (themeData.typography.baseFontSize) {
         root.style.setProperty(
           "--base-font-size",
-          `${themeData.typography.baseFontSize}px`
+          `${themeData.typography.baseFontSize}px`,
         );
       }
       if (themeData.typography.lineHeight) {
         root.style.setProperty(
           "--line-height",
-          String(themeData.typography.lineHeight)
+          String(themeData.typography.lineHeight),
         );
       }
     }
@@ -169,7 +169,7 @@ export function useUserTheme({
   // Customize a specific component
   const customizeComponent = async (
     componentName: string,
-    settings: Record<string, any>
+    settings: Record<string, any>,
   ): Promise<boolean> => {
     try {
       const res = await fetch(
@@ -178,7 +178,7 @@ export function useUserTheme({
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(settings),
-        }
+        },
       );
 
       if (!res.ok) {
@@ -205,7 +205,7 @@ export function useUserTheme({
         `${backendUrl}/api/presets/${userId}/${presetId}`,
         {
           method: "POST",
-        }
+        },
       );
 
       if (!res.ok) {

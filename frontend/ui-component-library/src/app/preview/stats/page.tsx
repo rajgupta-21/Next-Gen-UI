@@ -126,9 +126,9 @@ export default function StatsPreview() {
           {/* Usage */}
           <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl shadow-2xl p-6 md:p-8 border border-blue-500/30 backdrop-blur-sm">
             <h3 className="text-xl font-bold text-white mb-4">💻 Usage</h3>
-            <CodeBlock 
-              code={`import { Stats } from '@your-scope/newgen-ui';\n\n// Single stat\n<Stats value="150K" label="Happy Users" />\n\n// Stats grid\n<div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '1rem' }}>\n  <Stats value="150K" label="Happy Users" />\n  <Stats value="98%" label="Satisfaction" />\n  <Stats value="50M+" label="Components Built" />\n</div>\n\n// Custom styling\n<Stats \n  value="150K+" \n  label="Happy Users"\n  style={{ padding: '2rem', backgroundColor: '#f0f9ff' }}\n/>`} 
-              language="jsx" 
+            <CodeBlock
+              code={`import { Stats } from '@rajgupta2509/next-gen-builder';\n\n// Single stat\n<Stats value="150K" label="Happy Users" />\n\n// Stats grid\n<div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '1rem' }}>\n  <Stats value="150K" label="Happy Users" />\n  <Stats value="98%" label="Satisfaction" />\n  <Stats value="50M+" label="Components Built" />\n</div>\n\n// Custom styling\n<Stats \n  value="150K+" \n  label="Happy Users"\n  style={{ padding: '2rem', backgroundColor: '#f0f9ff' }}\n/>`}
+              language="jsx"
             />
           </div>
 

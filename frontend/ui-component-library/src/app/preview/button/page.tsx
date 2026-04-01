@@ -16,7 +16,7 @@ function ButtonPreview() {
     return `{{ ${entries.join(", ")} } as React.CSSProperties}`;
   }
 
-  const exportCode = `import React from 'react';\nimport { Button } from '@your-scope/newgen-ui';\n\nexport default function CustomButton(){\n  return <div style=${toStyleObjectString(
+  const exportCode = `import React from 'react';\nimport { Button } from '@rajgupta2509/next-gen-builder';\n\nexport default function CustomButton(){\n  return <div style=${toStyleObjectString(
     vars,
   )}><Button variant="solid">Click me</Button></div>\n}`;
 
@@ -191,7 +191,7 @@ function ButtonPreview() {
           Usage
         </h3>
         <CodeBlock
-          code={`import { Button } from '@your-scope/newgen-ui';\n\n// Basic usage\n<Button>Click me</Button>\n\n// Variants\n<Button variant="solid">Solid</Button>\n<Button variant="outline">Outline</Button>\n<Button variant="ghost">Ghost</Button>\n<Button variant="gradient">Gradient</Button>\n\n// Sizes\n<Button size="sm">Small</Button>\n<Button size="md">Medium</Button>\n<Button size="lg">Large</Button>\n\n// With icons\n<Button leftIcon={<Icon />}>Add Item</Button>\n<Button rightIcon={<Icon />}>Next</Button>\n\n// States\n<Button isLoading>Loading...</Button>\n<Button disabled>Disabled</Button>\n\n// Custom theme\n<Button \n  variant="gradient"\n  theme={{ primary: "#10b981", primary600: "#059669" }}\n>\n  Custom Color\n</Button>`}
+          code={`import { Button } from '@rajgupta2509/next-gen-builder';\n\n// Basic usage\n<Button>Click me</Button>\n\n// Variants\n<Button variant="solid">Solid</Button>\n<Button variant="outline">Outline</Button>\n<Button variant="ghost">Ghost</Button>\n<Button variant="gradient">Gradient</Button>\n\n// Sizes\n<Button size="sm">Small</Button>\n<Button size="md">Medium</Button>\n<Button size="lg">Large</Button>\n\n// With icons\n<Button leftIcon={<Icon />}>Add Item</Button>\n<Button rightIcon={<Icon />}>Next</Button>\n\n// States\n<Button isLoading>Loading...</Button>\n<Button disabled>Disabled</Button>\n\n// Custom theme\n<Button \n  variant="gradient"\n  theme={{ primary: "#10b981", primary600: "#059669" }}\n>\n  Custom Color\n</Button>`}
           language="jsx"
         />
       </div>

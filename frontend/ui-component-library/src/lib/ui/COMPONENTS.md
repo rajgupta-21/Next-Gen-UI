@@ -7,7 +7,7 @@ Copy-paste usage (no build step required):
 1. Button
 
 ```tsx
-import Button from './src/lib/ui/Button';
+import Button from "./src/lib/ui/Button";
 
 export default function Example() {
   return <Button variant="primary">Click me</Button>;
@@ -17,7 +17,7 @@ export default function Example() {
 2. Card
 
 ```tsx
-import Card from './src/lib/ui/Card';
+import Card from "./src/lib/ui/Card";
 
 export default function ExampleCard() {
   return (
@@ -31,7 +31,7 @@ export default function ExampleCard() {
 3. Navbar
 
 ```tsx
-import LibNavbar from './src/lib/ui/Navbar';
+import LibNavbar from "./src/lib/ui/Navbar";
 
 export default function ExampleNav() {
   return <LibNavbar />;
@@ -48,13 +48,14 @@ Publishing as a package (high level):
 Importing from npm (after publishing):
 
 ```bash
-npm install @your-scope/newgen-ui
+npm install @rajgupta2509/next-gen-builder
 ```
 
 ```tsx
-import { Button, Card, Navbar } from '@your-scope/newgen-ui';
+import { Button, Card, Navbar } from "@rajgupta2509/next-gen-builder";
 ```
 
 Notes:
+
 - These example components use CSS variables defined in `src/app/globals.css`. If you copy them into a new project, add the token definitions or provide equivalent styles.
 - Consider bundling styles with the package (CSS-in-JS, CSS module, or provide a small CSS file to import).

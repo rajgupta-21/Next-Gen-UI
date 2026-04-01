@@ -17,8 +17,8 @@ export default function DropdownPreview() {
     return `{{ ${entries.join(", ")} } as React.CSSProperties}`;
   }
 
-  const exportCode = `import React from 'react';\nimport { Dropdown } from '@your-scope/newgen-ui';\n\nexport default function CustomDropdown(){\n  return <div style=${toStyleObjectString(
-    vars
+  const exportCode = `import React from 'react';\nimport { Dropdown } from '@rajgupta2509/next-gen-builder';\n\nexport default function CustomDropdown(){\n  return <div style=${toStyleObjectString(
+    vars,
   )}><Dropdown label="Select an Option" items={items} /></div>\n}`;
 
   return (
@@ -149,9 +149,9 @@ export default function DropdownPreview() {
         <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">
           Usage
         </h3>
-        <CodeBlock 
-          code={`import { Dropdown } from '@your-scope/newgen-ui';\n\nconst items = [\n  { label: "Option 1", value: "1" },\n  { label: "Option 2", value: "2" },\n  { label: "Option 3", value: "3" }\n];\n\n// Basic usage\n<Dropdown label="Select an Option" items={items} />\n\n// Custom theme\n<Dropdown \n  label="Select an Option" \n  items={items} \n  theme={{\n    background: "#f8f9fa",\n    text: "#495057",\n    border: "#10b981",\n    hover: "#d1ecf1"\n  }}\n/>\n\n// With onClick handlers\nconst itemsWithClick = [\n  { label: "Option 1", value: "1", onClick: () => console.log("Option 1 selected") },\n  { label: "Option 2", value: "2", onClick: () => console.log("Option 2 selected") },\n];\n\n<Dropdown label="Select an Option" items={itemsWithClick} />`} 
-          language="jsx" 
+        <CodeBlock
+          code={`import { Dropdown } from '@rajgupta2509/next-gen-builder';\n\nconst items = [\n  { label: "Option 1", value: "1" },\n  { label: "Option 2", value: "2" },\n  { label: "Option 3", value: "3" }\n];\n\n// Basic usage\n<Dropdown label="Select an Option" items={items} />\n\n// Custom theme\n<Dropdown \n  label="Select an Option" \n  items={items} \n  theme={{\n    background: "#f8f9fa",\n    text: "#495057",\n    border: "#10b981",\n    hover: "#d1ecf1"\n  }}\n/>\n\n// With onClick handlers\nconst itemsWithClick = [\n  { label: "Option 1", value: "1", onClick: () => console.log("Option 1 selected") },\n  { label: "Option 2", value: "2", onClick: () => console.log("Option 2 selected") },\n];\n\n<Dropdown label="Select an Option" items={itemsWithClick} />`}
+          language="jsx"
         />
       </div>
 

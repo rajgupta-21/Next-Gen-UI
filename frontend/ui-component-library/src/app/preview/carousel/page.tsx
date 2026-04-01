@@ -23,8 +23,8 @@ export default function CarouselPreview() {
     return `{{ ${entries.join(", ")} } as React.CSSProperties}`;
   }
 
-  const exportCode = `import React from 'react';\nimport { Carousel } from '@your-scope/newgen-ui';\n\nexport default function CustomCarousel(){\n  const slides = [\n    <div>Slide 1</div>,\n    <div>Slide 2</div>,\n    <div>Slide 3</div>\n  ];\n  return <div style=${toStyleObjectString(
-    vars
+  const exportCode = `import React from 'react';\nimport { Carousel } from '@rajgupta2509/next-gen-builder';\n\nexport default function CustomCarousel(){\n  const slides = [\n    <div>Slide 1</div>,\n    <div>Slide 2</div>,\n    <div>Slide 3</div>\n  ];\n  return <div style=${toStyleObjectString(
+    vars,
   )}><Carousel slides={slides} /></div>\n}`;
 
   return (
@@ -135,9 +135,9 @@ export default function CarouselPreview() {
         <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">
           Usage
         </h3>
-        <CodeBlock 
-          code={`import { Carousel } from '@your-scope/newgen-ui';\n\nconst slides = [\n  <div className="h-48 flex items-center justify-center bg-red-300">Slide 1</div>,\n  <div className="h-48 flex items-center justify-center bg-green-300">Slide 2</div>,\n  <div className="h-48 flex items-center justify-center bg-blue-300">Slide 3</div>\n];\n\n// Basic usage\n<Carousel slides={slides} />\n\n// Custom theme\n<Carousel \n  slides={slides} \n  theme={{\n    background: "#f0f9ff",\n    indicator: "#10b981",\n    inactiveIndicator: "#d1d5db"\n  }}\n/>\n\n// With custom slides\nconst customSlides = [\n  <img src="image1.jpg" alt="Slide 1" />,\n  <img src="image2.jpg" alt="Slide 2" />,\n  <img src="image3.jpg" alt="Slide 3" />\n];\n\n<Carousel slides={customSlides} />`} 
-          language="jsx" 
+        <CodeBlock
+          code={`import { Carousel } from '@rajgupta2509/next-gen-builder';\n\nconst slides = [\n  <div className="h-48 flex items-center justify-center bg-red-300">Slide 1</div>,\n  <div className="h-48 flex items-center justify-center bg-green-300">Slide 2</div>,\n  <div className="h-48 flex items-center justify-center bg-blue-300">Slide 3</div>\n];\n\n// Basic usage\n<Carousel slides={slides} />\n\n// Custom theme\n<Carousel \n  slides={slides} \n  theme={{\n    background: "#f0f9ff",\n    indicator: "#10b981",\n    inactiveIndicator: "#d1d5db"\n  }}\n/>\n\n// With custom slides\nconst customSlides = [\n  <img src="image1.jpg" alt="Slide 1" />,\n  <img src="image2.jpg" alt="Slide 2" />,\n  <img src="image3.jpg" alt="Slide 3" />\n];\n\n<Carousel slides={customSlides} />`}
+          language="jsx"
         />
       </div>
 

@@ -90,9 +90,9 @@ export default function Footer() {
           {/* Usage */}
           <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl shadow-2xl p-6 md:p-8 border border-blue-500/30 backdrop-blur-sm">
             <h3 className="text-xl font-bold text-white mb-4">💻 Usage</h3>
-            <CodeBlock 
-              code={`import { Footer } from '@your-scope/newgen-ui';\n\n// Basic usage\n<Footer />\n\n// Custom footer\n<Footer \n  bgColor="#1F2937"\n  textColor="#FFFFFF"\n  copyright="© 2024 Your Company"\n/>\n\n// With multiple columns\n<Footer>\n  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr' }}>\n    <div>\n      <h4>Product</h4>\n      <ul>\n        <li><a href="#">Features</a></li>\n        <li><a href="#">Pricing</a></li>\n      </ul>\n    </div>\n    <div>\n      <h4>Company</h4>\n      <ul>\n        <li><a href="#">About</a></li>\n        <li><a href="#">Blog</a></li>\n      </ul>\n    </div>\n    <div>\n      <h4>Legal</h4>\n      <ul>\n        <li><a href="#">Privacy</a></li>\n        <li><a href="#">Terms</a></li>\n      </ul>\n    </div>\n  </div>\n</Footer>`} 
-              language="jsx" 
+            <CodeBlock
+              code={`import { Footer } from '@rajgupta2509/next-gen-builder';\n\n// Basic usage\n<Footer />\n\n// Custom footer\n<Footer \n  bgColor="#1F2937"\n  textColor="#FFFFFF"\n  copyright="© 2024 Your Company"\n/>\n\n// With multiple columns\n<Footer>\n  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr' }}>\n    <div>\n      <h4>Product</h4>\n      <ul>\n        <li><a href="#">Features</a></li>\n        <li><a href="#">Pricing</a></li>\n      </ul>\n    </div>\n    <div>\n      <h4>Company</h4>\n      <ul>\n        <li><a href="#">About</a></li>\n        <li><a href="#">Blog</a></li>\n      </ul>\n    </div>\n    <div>\n      <h4>Legal</h4>\n      <ul>\n        <li><a href="#">Privacy</a></li>\n        <li><a href="#">Terms</a></li>\n      </ul>\n    </div>\n  </div>\n</Footer>`}
+              language="jsx"
             />
           </div>
 

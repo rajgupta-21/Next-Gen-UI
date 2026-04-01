@@ -17,7 +17,7 @@ export default function NavbarPreview() {
     return `{{ ${entries.join(", ")} } as React.CSSProperties}`;
   }
 
-  const exportCode = `import React from 'react';\nimport { Navbar } from '@your-scope/newgen-ui';\n\nexport default function CustomNavbar(){\n  return <div style=${toStyleObjectString(
+  const exportCode = `import React from 'react';\nimport { Navbar } from '@rajgupta2509/next-gen-builder';\n\nexport default function CustomNavbar(){\n  return <div style=${toStyleObjectString(
     vars,
   )}><Navbar /></div>\n}`;
 
@@ -69,17 +69,15 @@ export default function NavbarPreview() {
             />
           </div>
         </div>
-
       </div>
-
 
       <div>
         <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">
           Usage
         </h3>
-        <CodeBlock 
-          code={`import { Navbar } from '@your-scope/newgen-ui';\n\n// Basic usage\n<Navbar />\n\n// Custom theme\n<Navbar \n  theme={{ primary: "#10b981", primary600: "#059669" }}\n/>\n\n// Custom brand\n<Navbar \n  brand={\n    <div className="flex items-center gap-3">\n      <div className="w-8 h-8 rounded-md bg-red-500 flex items-center justify-center text-white font-bold">\n        C\n      </div>\n      <div>\n        <div className="font-semibold">Custom Brand</div>\n      </div>\n    </div>\n  }\n/>\n\n// Custom links\n<Navbar \n  links={[\n    { href: "/", label: "Home" },\n    { href: "/about", label: "About" },\n  ]}\n/>`} 
-          language="jsx" 
+        <CodeBlock
+          code={`import { Navbar } from '@rajgupta2509/next-gen-builder';\n\n// Basic usage\n<Navbar />\n\n// Custom theme\n<Navbar \n  theme={{ primary: "#10b981", primary600: "#059669" }}\n/>\n\n// Custom brand\n<Navbar \n  brand={\n    <div className="flex items-center gap-3">\n      <div className="w-8 h-8 rounded-md bg-red-500 flex items-center justify-center text-white font-bold">\n        C\n      </div>\n      <div>\n        <div className="font-semibold">Custom Brand</div>\n      </div>\n    </div>\n  }\n/>\n\n// Custom links\n<Navbar \n  links={[\n    { href: "/", label: "Home" },\n    { href: "/about", label: "About" },\n  ]}\n/>`}
+          language="jsx"
         />
       </div>
 

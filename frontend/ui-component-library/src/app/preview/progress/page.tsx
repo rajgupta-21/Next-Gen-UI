@@ -19,8 +19,8 @@ function ProgressPreview() {
     return `{{ ${entries.join(", ")} } as React.CSSProperties}`;
   }
 
-  const exportCode = `import React from 'react';\nimport { Progress } from '@your-scope/newgen-ui';\n\nexport default function CustomProgress(){\n  return <div style=${toStyleObjectString(
-    vars
+  const exportCode = `import React from 'react';\nimport { Progress } from '@rajgupta2509/next-gen-builder';\n\nexport default function CustomProgress(){\n  return <div style=${toStyleObjectString(
+    vars,
   )}><Progress value={65} showLabel /></div>\n}`;
 
   return (
@@ -81,16 +81,15 @@ function ProgressPreview() {
             />
           </div>
         </div>
-
       </div>
 
       <div>
         <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">
           Usage
         </h3>
-        <CodeBlock 
-          code={`import { Progress } from '@your-scope/newgen-ui';\n\n// Basic usage\n<Progress value={65} />\n\n// With label\n<Progress value={65} showLabel />\n\n// Gradient variant\n<Progress value={65} variant="gradient" showLabel />\n\n// Striped and animated\n<Progress value={65} variant="striped" animated showLabel />\n\n// Different sizes\n<Progress value={65} size="sm" />\n<Progress value={65} size="md" />\n<Progress value={65} size="lg" />\n\n// Custom theme\n<Progress \n  value={65} \n  variant="gradient"\n  theme={{ primary: "#10b981", primary600: "#059669" }}\n  showLabel \n/>`} 
-          language="jsx" 
+        <CodeBlock
+          code={`import { Progress } from '@rajgupta2509/next-gen-builder';\n\n// Basic usage\n<Progress value={65} />\n\n// With label\n<Progress value={65} showLabel />\n\n// Gradient variant\n<Progress value={65} variant="gradient" showLabel />\n\n// Striped and animated\n<Progress value={65} variant="striped" animated showLabel />\n\n// Different sizes\n<Progress value={65} size="sm" />\n<Progress value={65} size="md" />\n<Progress value={65} size="lg" />\n\n// Custom theme\n<Progress \n  value={65} \n  variant="gradient"\n  theme={{ primary: "#10b981", primary600: "#059669" }}\n  showLabel \n/>`}
+          language="jsx"
         />
       </div>
 

@@ -52,9 +52,17 @@ export default function DocumentationPage() {
                 Install NewGen UI components in your React/Next.js project:
               </p>
               <div className="space-y-4">
-                <CodeBlock code="npm install @your-scope/newgen-ui" language="bash" />
-                <p className="text-gray-500 dark:text-gray-400 text-sm">Or with yarn:</p>
-                <CodeBlock code="yarn add @your-scope/newgen-ui" language="bash" />
+                <CodeBlock
+                  code="npm install @rajgupta2509/next-gen-builder"
+                  language="bash"
+                />
+                <p className="text-gray-500 dark:text-gray-400 text-sm">
+                  Or with yarn:
+                </p>
+                <CodeBlock
+                  code="yarn add @rajgupta2509/next-gen-builder"
+                  language="bash"
+                />
               </div>
             </div>
           </section>
@@ -101,6 +109,16 @@ export default function DocumentationPage() {
                   without code
                 </p>
               </div>
+              <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+                <h3 className="font-bold text-gray-900 dark:text-white mb-2">
+                  Real-time Deployment
+                </h3>
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  Deploy from the builder directly to Netlify using your token.
+                  Watch build status and live URLs in the integrated deploy
+                  panel.
+                </p>
+              </div>
             </div>
           </section>
 
@@ -114,8 +132,8 @@ export default function DocumentationPage() {
                 <h3 className="font-bold text-gray-900 dark:text-white mb-3 text-lg">
                   Basic Component Usage
                 </h3>
-                <CodeBlock 
-                  code={`import { Button, Card, Tabs } from '@your-scope/newgen-ui';\n\nexport default function MyApp() {\n  return (\n    <Card title="Welcome">\n      <Button variant="primary">Click Me</Button>\n      <Tabs\n        items={[\n          { id: '1', label: 'Tab 1', content: <div>Content 1</div> },\n          { id: '2', label: 'Tab 2', content: <div>Content 2</div> }\n        ]}\n      />\n    </Card>\n  );\n}`}
+                <CodeBlock
+                  code={`import { Button, Card, Tabs } from '@rajgupta2509/next-gen-builder';\n\nexport default function MyApp() {\n  return (\n    <Card title="Welcome">\n      <Button variant="primary">Click Me</Button>\n      <Tabs\n        items={[\n          { id: '1', label: 'Tab 1', content: <div>Content 1</div> },\n          { id: '2', label: 'Tab 2', content: <div>Content 2</div> }\n        ]}\n      />\n    </Card>\n  );\n}`}
                   language="tsx"
                 />
               </div>
@@ -136,24 +154,32 @@ export default function DocumentationPage() {
                 </p>
                 <ol className="text-gray-600 dark:text-gray-400 space-y-2 ml-4">
                   <li className="flex gap-3">
-                    <span className="font-bold text-gray-900 dark:text-white">1.</span>
+                    <span className="font-bold text-gray-900 dark:text-white">
+                      1.
+                    </span>
                     <span>
                       Describe your component in natural language (e.g., "Create
                       a modern pricing card")
                     </span>
                   </li>
                   <li className="flex gap-3">
-                    <span className="font-bold text-gray-900 dark:text-white">2.</span>
+                    <span className="font-bold text-gray-900 dark:text-white">
+                      2.
+                    </span>
                     <span>
                       Click "Generate Component" and watch AI create the code
                     </span>
                   </li>
                   <li className="flex gap-3">
-                    <span className="font-bold text-gray-900 dark:text-white">3.</span>
+                    <span className="font-bold text-gray-900 dark:text-white">
+                      3.
+                    </span>
                     <span>Preview the live component with Sandpack</span>
                   </li>
                   <li className="flex gap-3">
-                    <span className="font-bold text-gray-900 dark:text-white">4.</span>
+                    <span className="font-bold text-gray-900 dark:text-white">
+                      4.
+                    </span>
                     <span>Copy or download the generated code</span>
                   </li>
                 </ol>
@@ -213,10 +239,10 @@ export default function DocumentationPage() {
               <p className="text-gray-600 dark:text-gray-400">
                 Customize component appearance with theme props:
               </p>
-                <CodeBlock 
-                  code={`<Tabs\n  items={items}\n  theme={{\n    primary: "#10b981",\n    primary600: "#059669"\n  }}\n  variant="pills"\n  size="lg"\n/>`}
-                  language="tsx"
-                />
+              <CodeBlock
+                code={`<Tabs\n  items={items}\n  theme={{\n    primary: "#10b981",\n    primary600: "#059669"\n  }}\n  variant="pills"\n  size="lg"\n/>`}
+                language="tsx"
+              />
               <p className="text-gray-500 dark:text-gray-400 text-sm">
                 Each component supports customizable theme tokens and CSS
                 variables for seamless integration with your design system.
@@ -231,28 +257,36 @@ export default function DocumentationPage() {
             </h2>
             <ul className="text-gray-600 dark:text-gray-400 space-y-3 ml-4">
               <li className="flex gap-3">
-                <span className="text-gray-900 dark:text-white font-bold">1.</span>
+                <span className="text-gray-900 dark:text-white font-bold">
+                  1.
+                </span>
                 <span>
                   <strong>Use TypeScript:</strong> All components are fully
                   typed for better DX
                 </span>
               </li>
               <li className="flex gap-3">
-                <span className="text-gray-900 dark:text-white font-bold">2.</span>
+                <span className="text-gray-900 dark:text-white font-bold">
+                  2.
+                </span>
                 <span>
                   <strong>Leverage Theming:</strong> Use theme props for
                   consistent styling across your app
                 </span>
               </li>
               <li className="flex gap-3">
-                <span className="text-gray-900 dark:text-white font-bold">3.</span>
+                <span className="text-gray-900 dark:text-white font-bold">
+                  3.
+                </span>
                 <span>
                   <strong>Check Accessibility:</strong> All components follow
                   WCAG guidelines
                 </span>
               </li>
               <li className="flex gap-3">
-                <span className="text-gray-900 dark:text-white font-bold">4.</span>
+                <span className="text-gray-900 dark:text-white font-bold">
+                  4.
+                </span>
                 <span>
                   <strong>Experiment with AI:</strong> Use the generator for
                   rapid prototyping

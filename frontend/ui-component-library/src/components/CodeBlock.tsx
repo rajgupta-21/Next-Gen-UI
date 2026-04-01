@@ -10,7 +10,11 @@ interface CodeBlockProps {
   className?: string;
 }
 
-export default function CodeBlock({ code, language, className = "" }: CodeBlockProps) {
+export default function CodeBlock({
+  code,
+  language,
+  className = "",
+}: CodeBlockProps) {
   const [highlightedCode, setHighlightedCode] = useState<string>("");
   const [copied, setCopied] = useState(false);
 
@@ -21,7 +25,7 @@ export default function CodeBlock({ code, language, className = "" }: CodeBlockP
         if (lang === "react" || lang === "jsx") lang = "tsx";
         if (lang === "angular") lang = "html"; // Or angular-html if available in shiki version
         if (lang === "javascript") lang = "js";
-        
+
         const html = await codeToHtml(code, {
           lang: lang,
           theme: "github-dark-dimmed", // More premium look
@@ -42,10 +46,12 @@ export default function CodeBlock({ code, language, className = "" }: CodeBlockP
   };
 
   return (
-    <div className={`relative group rounded-xl overflow-hidden border border-gray-200 dark:border-gray-800 bg-[#0d1117] ${className}`}>
+    <div
+      className={`relative group rounded-xl overflow-hidden border border-gray-200 dark:border-gray-800 bg-[#0d1117] ${className}`}
+    >
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-2 bg-gray-900/50 border-b border-gray-800">
-        <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">
+        <span className="text-xs font-bold text-gray-400 uppercase tracking-widest ">
           {language}
         </span>
         <button
@@ -53,12 +59,16 @@ export default function CodeBlock({ code, language, className = "" }: CodeBlockP
           className="p-1.5 text-gray-400 hover:text-white hover:bg-gray-800 rounded-md transition-all"
           title="Copy code"
         >
-          {copied ? <Check className="w-4 h-4 text-green-500" /> : <Copy className="w-4 h-4" />}
+          {copied ? (
+            <Check className="w-4 h-4 text-green-500" />
+          ) : (
+            <Copy className="w-4 h-4" />
+          )}
         </button>
       </div>
 
       {/* Code Area */}
-      <div className="p-4 overflow-auto max-h-[400px] text-[13px] font-mono leading-relaxed shiki-container">
+      <div className="p-4 overflow-auto text-[13px] font-mono leading-relaxed shiki-container">
         {highlightedCode ? (
           <div
             dangerouslySetInnerHTML={{ __html: highlightedCode }}

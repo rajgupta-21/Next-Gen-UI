@@ -1,4 +1,8 @@
-import { ComponentCustomization, ComponentName, darkenHex } from "@/contexts/ComponentCustomContext";
+import {
+  ComponentCustomization,
+  ComponentName,
+  darkenHex,
+} from "@/contexts/ComponentCustomContext";
 
 export type Format = "react" | "html" | "angular";
 
@@ -15,7 +19,11 @@ const COMP_LABEL: Record<ComponentName, string> = {
   input: "Input",
 };
 
-export function generateCode(component: ComponentName, c: ComponentCustomization, format: Format): string {
+export function generateCode(
+  component: ComponentName,
+  c: ComponentCustomization,
+  format: Format,
+): string {
   const darker = darkenHex(c.primaryColor);
   const inlineStyle = (entries: [string, string][]) =>
     entries.map(([k, v]) => `${k}: ${v}`).join("; ");
@@ -23,7 +31,7 @@ export function generateCode(component: ComponentName, c: ComponentCustomization
   if (format === "react") {
     switch (component) {
       case "button":
-        return `import { Button } from 'newgen-ui';
+        return `import { Button } from '@rajgupta2509/next-gen-builder';
 
 export default function MyButton() {
   return (
@@ -59,7 +67,7 @@ export default function MyButton() {
   );
 }`;
       case "card":
-        return `import { Card } from 'newgen-ui';
+        return `import { Card } from '@rajgupta2509/next-gen-builder;
 
 export default function MyCard() {
   return (
@@ -80,7 +88,7 @@ export default function MyCard() {
   );
 }`;
       case "input":
-        return `import { Input } from 'newgen-ui';
+        return `import { Input } from '@rajgupta2509/next-gen-builder';
 
 export default function MyInput() {
   return (
@@ -99,11 +107,11 @@ export default function MyInput() {
   );
 }`;
       case "tabs":
-        return `import { Tabs } from 'newgen-ui';\n\nexport default function MyTabs() {\n  return (\n    <Tabs\n      items={[\n        { id: '1', label: '${c.label} 1', content: <p>Content 1</p> },\n        { id: '2', label: '${c.label} 2', content: <p>Content 2</p> },\n      ]}\n      theme={{\n        primary: '${c.primaryColor}',\n        primary600: '${darker}',\n      }}\n    />\n  );\n}`;
+        return `import { Tabs } from '@rajgupta2509/next-gen-builder';\n\nexport default function MyTabs() {\n  return (\n    <Tabs\n      items={[\n        { id: '1', label: '${c.label} 1', content: <p>Content 1</p> },\n        { id: '2', label: '${c.label} 2', content: <p>Content 2</p> },\n      ]}\n      theme={{\n        primary: '${c.primaryColor}',\n        primary600: '${darker}',\n      }}\n    />\n  );\n}`;
       case "progress":
-        return `import { Progress } from 'newgen-ui';\n\nexport default function MyProgress() {\n  return (\n    <div className="space-y-4">\n      <Progress value={65} showLabel theme={{ primary: '${c.primaryColor}' }} />\n      <Progress value={80} variant="gradient" showLabel theme={{ primary: '${c.primaryColor}', primary600: '${darker}' }} />\n    </div>\n  );\n}`;
+        return `import { Progress } from '@rajgupta2509/next-gen-builder';\n\nexport default function MyProgress() {\n  return (\n    <div className="space-y-4">\n      <Progress value={65} showLabel theme={{ primary: '${c.primaryColor}' }} />\n      <Progress value={80} variant="gradient" showLabel theme={{ primary: '${c.primaryColor}', primary600: '${darker}' }} />\n    </div>\n  );\n}`;
       case "pagination":
-        return `import { Pagination } from 'newgen-ui';
+        return `import { Pagination } from '@rajgupta2509/next-gen-builder';
 import { useState } from 'react';
 
 export default function MyPagination() {
@@ -121,7 +129,7 @@ export default function MyPagination() {
   );
 }`;
       case "dropdown":
-        return `import { Dropdown } from 'newgen-ui';
+        return `import { Dropdown } from '@rajgupta2509/next-gen-builder';
 
 export default function MyDropdown() {
   return (
@@ -140,7 +148,7 @@ export default function MyDropdown() {
   );
 }`;
       case "dialog":
-        return `import { Button, Dialog } from 'newgen-ui';
+        return `import { Button, Dialog } from '@rajgupta2509/next-gen-builder';
 import { useState } from 'react';
 
 export default function MyDialog() {
@@ -165,7 +173,7 @@ export default function MyDialog() {
   );
 }`;
       case "carousel":
-        return `import { Carousel } from 'newgen-ui';
+        return `import { Carousel } from '@rajgupta2509/next-gen-builder';
 
 export default function MyCarousel() {
   return (
@@ -177,7 +185,7 @@ export default function MyCarousel() {
   );
 }`;
       case "navbar":
-        return `import { Navbar } from 'newgen-ui';\n\nexport default function MyNavbar() {\n  return (\n    <Navbar \n      theme={{\n        primary: '${c.primaryColor}',\n        primary600: '${darker}',\n      }}\n    />\n  );\n}`;
+        return `import { Navbar } from '@rajgupta2509/next-gen-builder';\n\nexport default function MyNavbar() {\n  return (\n    <Navbar \n      theme={{\n        primary: '${c.primaryColor}',\n        primary600: '${darker}',\n      }}\n    />\n  );\n}`;
     }
   }
 
@@ -232,16 +240,16 @@ export default function MyCarousel() {
   type="text"
   placeholder="${c.label}"
   style="${inlineStyle([
-          ["border", `${c.borderWidth} ${c.borderStyle} ${c.primaryColor}`],
-          ["border-radius", c.borderRadius],
-          ["padding", c.padding],
-          ["font-size", c.fontSize],
-          ["letter-spacing", c.letterSpacing],
-          ["box-shadow", c.shadow],
-          ["outline", "none"],
-          ["width", "100%"],
-          ["box-sizing", "border-box"],
-        ])}"
+    ["border", `${c.borderWidth} ${c.borderStyle} ${c.primaryColor}`],
+    ["border-radius", c.borderRadius],
+    ["padding", c.padding],
+    ["font-size", c.fontSize],
+    ["letter-spacing", c.letterSpacing],
+    ["box-shadow", c.shadow],
+    ["outline", "none"],
+    ["width", "100%"],
+    ["box-sizing", "border-box"],
+  ])}"
 />`;
       default:
         return `<style>

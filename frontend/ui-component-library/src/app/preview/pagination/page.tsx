@@ -13,8 +13,8 @@ export default function PaginationPreview() {
     return `{{ ${entries.join(", ")} } as React.CSSProperties}`;
   }
 
-  const exportCode = `import React, { useState } from 'react';\nimport { Pagination } from '@your-scope/newgen-ui';\n\nexport default function CustomPagination(){\n  const [currentPage, setCurrentPage] = useState(1);\n  return <div style=${toStyleObjectString(
-    vars
+  const exportCode = `import React, { useState } from 'react';\nimport { Pagination } from '@rajgupta2509/next-gen-builder';\n\nexport default function CustomPagination(){\n  const [currentPage, setCurrentPage] = useState(1);\n  return <div style=${toStyleObjectString(
+    vars,
   )}><Pagination currentPage={currentPage} totalPages={10} onPageChange={setCurrentPage} /></div>\n}`;
 
   return (
@@ -112,9 +112,9 @@ export default function PaginationPreview() {
         <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">
           Usage
         </h3>
-        <CodeBlock 
-          code={`import { Pagination } from '@your-scope/newgen-ui';\n\n// Basic usage\n<Pagination \n  currentPage={currentPage} \n    totalPages={10} \n  onPageChange={setCurrentPage} \n/>\n\n// Custom theme\n<Pagination \n  currentPage={currentPage} \n  totalPages={10} \n  onPageChange={setCurrentPage}\n  theme={{ primary: "#10b981", primary600: "#059669" }}\n/>\n\n// With state management\nconst [page, setPage] = useState(1);\n\n<Pagination \n  currentPage={page} \n  totalPages={totalPages} \n  onPageChange={(newPage) => {\n    setPage(newPage);\n    // Fetch new data based on page\n  }}\n/>`} 
-          language="jsx" 
+        <CodeBlock
+          code={`import { Pagination } from '@rajgupta2509/next-gen-builder';\n\n// Basic usage\n<Pagination \n  currentPage={currentPage} \n    totalPages={10} \n  onPageChange={setCurrentPage} \n/>\n\n// Custom theme\n<Pagination \n  currentPage={currentPage} \n  totalPages={10} \n  onPageChange={setCurrentPage}\n  theme={{ primary: "#10b981", primary600: "#059669" }}\n/>\n\n// With state management\nconst [page, setPage] = useState(1);\n\n<Pagination \n  currentPage={page} \n  totalPages={totalPages} \n  onPageChange={(newPage) => {\n    setPage(newPage);\n    // Fetch new data based on page\n  }}\n/>`}
+          language="jsx"
         />
       </div>
 

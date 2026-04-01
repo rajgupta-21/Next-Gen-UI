@@ -15,7 +15,7 @@ const Usage = () => {
           component.
         </p>
         <CodeSnippet language="tsx">
-          {`import { Button } from '@your-scope/newgen-ui';
+          {`import { Button } from '@rajgupta2509/next-gen-builder';
 
 export default function MyComponent() {
   return (

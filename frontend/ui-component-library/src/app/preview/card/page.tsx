@@ -28,8 +28,8 @@ function CardPreview() {
     return `{{ ${entries.join(", ")} } as React.CSSProperties}`;
   }
 
-  const exportCode = `import React from 'react';\nimport { Card } from '@your-scope/newgen-ui';\n\nexport default function CustomCard(){\n  return <div style=${toStyleObjectString(
-    vars
+  const exportCode = `import React from 'react';\nimport { Card } from '@rajgupta2509/next-gen-builder';\n\nexport default function CustomCard(){\n  return <div style=${toStyleObjectString(
+    vars,
   )}><Card title="Card Title">Card content here</Card></div>\n}`;
 
   return (
@@ -231,7 +231,7 @@ function CardPreview() {
           Usage
         </h3>
         <CodeBlock
-          code={`import { Card } from '@your-scope/newgen-ui';
+          code={`import { Card } from '@rajgupta2509/next-gen-builder';
 
 // Basic usage
 <Card title="Card Title">

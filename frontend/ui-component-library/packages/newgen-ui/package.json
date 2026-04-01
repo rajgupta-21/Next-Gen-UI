@@ -1,22 +1,30 @@
 {
-  "name": "@your-scope/newgen-ui",
+  "name": "@rajgupta2509/next-gen-builder",
   "version": "1.0.0",
-  "description": "A comprehensive UI component library built with React and TypeScript",
-  "author": "Your Name",
+  "description": "AI-powered UI component library with multi-framework export support",
+  "author": "Raj Gupta",
   "license": "MIT",
+  "type": "module",
   "repository": {
     "type": "git",
-    "url": "https://github.com/your-org/your-repo"
+    "url": "https://github.com/rajgupta-21/Next-Gen-UI"
   },
-  "main": "dist/index.cjs.js",
-  "module": "dist/index.esm.js",
+  "main": "dist/index.cjs",
+  "module": "dist/index.js",
   "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs",
+      "types": "./dist/index.d.ts"
+    }
+  },
   "files": [
     "dist"
   ],
+  "sideEffects": false,
   "scripts": {
-    "build": "tsup src/index.ts --format cjs,esm --dts",
-    "test": "echo \"no tests\" && exit 0"
+    "build": "tsup src/index.ts --format cjs,esm --dts --clean --sourcemap"
   },
   "peerDependencies": {
     "react": "^18.0.0 || ^19.0.0",

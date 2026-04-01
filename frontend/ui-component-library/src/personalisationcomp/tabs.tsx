@@ -11,18 +11,38 @@ import {
 } from "@/contexts/ComponentCustomContext";
 import { Dropdown, Input, Pagination, Progress } from "@/lib/ui";
 import React, { useState } from "react";
-import { Button, Card, Carousel, Dialog, Tabs } from "../../packages/newgen-ui/src";
+import {
+  Button,
+  Card,
+  Carousel,
+  Dialog,
+  Tabs,
+} from "../../packages/newgen-ui/src";
 import LibNavbar from "../../packages/newgen-ui/src/components/Navbar";
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
 const COMP_LABEL: Record<ComponentName, string> = {
-  button: "Button", card: "Card", navbar: "Navbar", dialog: "Dialog",
-  carousel: "Carousel", dropdown: "Dropdown", tabs: "Tabs",
-  progress: "Progress", pagination: "Pagination", input: "Input",
+  button: "Button",
+  card: "Card",
+  navbar: "Navbar",
+  dialog: "Dialog",
+  carousel: "Carousel",
+  dropdown: "Dropdown",
+  tabs: "Tabs",
+  progress: "Progress",
+  pagination: "Pagination",
+  input: "Input",
 };
 
-const FONT_SIZES = ["0.75rem", "0.875rem", "1rem", "1.125rem", "1.25rem", "1.5rem"];
+const FONT_SIZES = [
+  "0.75rem",
+  "0.875rem",
+  "1rem",
+  "1.125rem",
+  "1.25rem",
+  "1.5rem",
+];
 const FONT_WEIGHTS = [
   { label: "Light — 300", value: "300" },
   { label: "Regular — 400", value: "400" },
@@ -117,7 +137,11 @@ function ghostBtnStyle(c: ComponentCustomization): React.CSSProperties {
 
 // ─── Code generator ───────────────────────────────────────────────────────────
 
-function generateCode(component: ComponentName, c: ComponentCustomization, format: Format): string {
+function generateCode(
+  component: ComponentName,
+  c: ComponentCustomization,
+  format: Format,
+): string {
   const darker = darkenHex(c.primaryColor);
   const styleObj = (entries: [string, string][]) =>
     entries.map(([k, v]) => `    '${k}': '${v}'`).join(",\n");
@@ -127,7 +151,7 @@ function generateCode(component: ComponentName, c: ComponentCustomization, forma
   if (format === "react") {
     switch (component) {
       case "button":
-        return `import { Button } from 'newgen-ui';
+        return `import { Button } from '@rajgupta2509/next-gen-builder';
 
 export default function MyButton() {
   return (
@@ -163,7 +187,7 @@ export default function MyButton() {
   );
 }`;
       case "card":
-        return `import { Card } from 'newgen-ui';
+        return `import { Card } from '@rajgupta2509/next-gen-builder';
 
 export default function MyCard() {
   return (
@@ -184,7 +208,7 @@ export default function MyCard() {
   );
 }`;
       case "input":
-        return `import { Input } from 'newgen-ui';
+        return `import { Input } from '@rajgupta2509/next-gen-builder';
 
 export default function MyInput() {
   return (
@@ -203,7 +227,7 @@ export default function MyInput() {
   );
 }`;
       case "tabs":
-        return `import { Tabs } from 'newgen-ui';
+        return `import { Tabs } from '@rajgupta2509/next-gen-builder';
 
 export default function MyTabs() {
   return (
@@ -220,7 +244,7 @@ export default function MyTabs() {
   );
 }`;
       case "progress":
-        return `import { Progress } from 'newgen-ui';
+        return `import { Progress } from '@rajgupta2509/next-gen-builder';
 
 export default function MyProgress() {
   return (
@@ -231,7 +255,7 @@ export default function MyProgress() {
   );
 }`;
       case "pagination":
-        return `import { Pagination } from 'newgen-ui';
+        return `import { Pagination } from '@rajgupta2509/next-gen-builder';
 import { useState } from 'react';
 
 export default function MyPagination() {
@@ -249,7 +273,7 @@ export default function MyPagination() {
   );
 }`;
       case "dropdown":
-        return `import { Dropdown } from 'newgen-ui';
+        return `import { Dropdown } from '@rajgupta2509/next-gen-builder';
 
 export default function MyDropdown() {
   return (
@@ -268,7 +292,7 @@ export default function MyDropdown() {
   );
 }`;
       case "dialog":
-        return `import { Button, Dialog } from 'newgen-ui';
+        return `import { Button, Dialog } from '@rajgupta2509/next-gen-builder';
 import { useState } from 'react';
 
 export default function MyDialog() {
@@ -293,7 +317,7 @@ export default function MyDialog() {
   );
 }`;
       case "carousel":
-        return `import { Carousel } from 'newgen-ui';
+        return `import { Carousel } from '@rajgupta2509/next-gen-builder';
 
 export default function MyCarousel() {
   return (
@@ -306,7 +330,7 @@ export default function MyCarousel() {
 }`;
       case "navbar":
         return `// Wrap Navbar with a CSS variable override to apply your brand color:
-import Navbar from 'newgen-ui/Navbar';
+import {Navbar} from '@rajgupta2509/next-gen-builder';
 
 export default function MyNavbar() {
   return (
@@ -323,43 +347,43 @@ export default function MyNavbar() {
       case "button":
         return `<!-- Solid button -->
 <button style="${inlineStyle([
-  ["background-color", c.primaryColor],
-  ["color", c.textColor],
-  ["border-radius", c.borderRadius],
-  ["font-size", c.fontSize],
-  ["font-weight", c.fontWeight],
-  ["letter-spacing", c.letterSpacing],
-  ["padding", c.padding],
-  ["box-shadow", c.shadow],
-  ["border", `${c.borderWidth} ${c.borderStyle} ${c.primaryColor}`],
-  ["cursor", "pointer"],
-  ["transition", "opacity 0.2s"],
-])}">
+          ["background-color", c.primaryColor],
+          ["color", c.textColor],
+          ["border-radius", c.borderRadius],
+          ["font-size", c.fontSize],
+          ["font-weight", c.fontWeight],
+          ["letter-spacing", c.letterSpacing],
+          ["padding", c.padding],
+          ["box-shadow", c.shadow],
+          ["border", `${c.borderWidth} ${c.borderStyle} ${c.primaryColor}`],
+          ["cursor", "pointer"],
+          ["transition", "opacity 0.2s"],
+        ])}">
   ${c.label}
 </button>
 
 <!-- Outline button -->
 <button style="${inlineStyle([
-  ["background-color", "transparent"],
-  ["color", c.primaryColor],
-  ["border", `2px ${c.borderStyle} ${c.primaryColor}`],
-  ["border-radius", c.borderRadius],
-  ["font-size", c.fontSize],
-  ["font-weight", c.fontWeight],
-  ["padding", c.padding],
-  ["cursor", "pointer"],
-])}">
+          ["background-color", "transparent"],
+          ["color", c.primaryColor],
+          ["border", `2px ${c.borderStyle} ${c.primaryColor}`],
+          ["border-radius", c.borderRadius],
+          ["font-size", c.fontSize],
+          ["font-weight", c.fontWeight],
+          ["padding", c.padding],
+          ["cursor", "pointer"],
+        ])}">
   ${c.label}
 </button>`;
       case "card":
         return `<div style="${inlineStyle([
-  ["background-color", "#ffffff"],
-  ["border", `${c.borderWidth} ${c.borderStyle} ${c.primaryColor}44`],
-  ["border-radius", c.borderRadius],
-  ["padding", c.padding],
-  ["box-shadow", c.shadow],
-  ["font-size", c.fontSize],
-])}">
+          ["background-color", "#ffffff"],
+          ["border", `${c.borderWidth} ${c.borderStyle} ${c.primaryColor}44`],
+          ["border-radius", c.borderRadius],
+          ["padding", c.padding],
+          ["box-shadow", c.shadow],
+          ["font-size", c.fontSize],
+        ])}">
   <h3 style="font-weight: 700; margin-bottom: 0.5rem;">${c.label}</h3>
   <p style="color: #6b7280; font-size: 0.875rem;">A short description</p>
   <div style="margin-top: 1rem;">Card content here.</div>
@@ -369,16 +393,16 @@ export default function MyNavbar() {
   type="text"
   placeholder="${c.label}"
   style="${inlineStyle([
-  ["border", `${c.borderWidth} ${c.borderStyle} ${c.primaryColor}`],
-  ["border-radius", c.borderRadius],
-  ["padding", c.padding],
-  ["font-size", c.fontSize],
-  ["letter-spacing", c.letterSpacing],
-  ["box-shadow", c.shadow],
-  ["outline", "none"],
-  ["width", "100%"],
-  ["box-sizing", "border-box"],
-])}"
+    ["border", `${c.borderWidth} ${c.borderStyle} ${c.primaryColor}`],
+    ["border-radius", c.borderRadius],
+    ["padding", c.padding],
+    ["font-size", c.fontSize],
+    ["letter-spacing", c.letterSpacing],
+    ["box-shadow", c.shadow],
+    ["outline", "none"],
+    ["width", "100%"],
+    ["box-sizing", "border-box"],
+  ])}"
 />`;
       default:
         return `<style>
@@ -504,13 +528,22 @@ export class My${COMP_LABEL[component]}Component {}`;
 
 // ─── Live preview ─────────────────────────────────────────────────────────────
 
-function LivePreview({ component, c }: { component: ComponentName; c: ComponentCustomization }) {
+function LivePreview({
+  component,
+  c,
+}: {
+  component: ComponentName;
+  c: ComponentCustomization;
+}) {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [page, setPage] = useState(1);
   const varStyle = buildVarStyle(c.primaryColor);
 
   const wrap = (children: React.ReactNode) => (
-    <div style={varStyle} className="p-6 bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 min-h-[140px] flex items-center justify-center">
+    <div
+      style={varStyle}
+      className="p-6 bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 min-h-[140px] flex items-center justify-center"
+    >
       {children}
     </div>
   );
@@ -520,9 +553,13 @@ function LivePreview({ component, c }: { component: ComponentName; c: ComponentC
       return wrap(
         <div className="flex flex-wrap gap-3">
           <Button style={solidBtnStyle(c)}>{c.label}</Button>
-          <Button variant="outline" style={outlineBtnStyle(c)}>{c.label}</Button>
-          <Button variant="ghost" style={ghostBtnStyle(c)}>{c.label}</Button>
-        </div>
+          <Button variant="outline" style={outlineBtnStyle(c)}>
+            {c.label}
+          </Button>
+          <Button variant="ghost" style={ghostBtnStyle(c)}>
+            {c.label}
+          </Button>
+        </div>,
       );
 
     case "card":
@@ -540,12 +577,15 @@ function LivePreview({ component, c }: { component: ComponentName; c: ComponentC
           className="w-full max-w-sm"
         >
           <p className="text-sm">Card content here.</p>
-        </Card>
+        </Card>,
       );
 
     case "navbar":
       return (
-        <div style={varStyle} className="rounded-xl overflow-hidden border border-gray-200 dark:border-gray-800">
+        <div
+          style={varStyle}
+          className="rounded-xl overflow-hidden border border-gray-200 dark:border-gray-800"
+        >
           <LibNavbar />
         </div>
       );
@@ -569,10 +609,17 @@ function LivePreview({ component, c }: { component: ComponentName; c: ComponentC
           >
             Open {c.label}
           </Button>
-          <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} title={c.label}>
-            <p>This is a customizable dialog. Your accent color is applied to the trigger button and dialog elements.</p>
+          <Dialog
+            open={dialogOpen}
+            onClose={() => setDialogOpen(false)}
+            title={c.label}
+          >
+            <p>
+              This is a customizable dialog. Your accent color is applied to the
+              trigger button and dialog elements.
+            </p>
           </Dialog>
-        </>
+        </>,
       );
 
     case "carousel":
@@ -580,9 +627,37 @@ function LivePreview({ component, c }: { component: ComponentName; c: ComponentC
         <div style={varStyle} className="rounded-xl overflow-hidden w-full">
           <Carousel
             slides={[
-              <div key="1" className="h-36 flex items-center justify-center text-white font-bold rounded-lg" style={{ background: c.primaryColor, fontSize: c.fontSize, letterSpacing: c.letterSpacing }}>Slide 1</div>,
-              <div key="2" className="h-36 flex items-center justify-center text-white font-bold rounded-lg" style={{ background: darkenHex(c.primaryColor, 0.1), fontSize: c.fontSize }}>Slide 2</div>,
-              <div key="3" className="h-36 flex items-center justify-center text-white font-bold rounded-lg" style={{ background: darkenHex(c.primaryColor, 0.2), fontSize: c.fontSize }}>Slide 3</div>,
+              <div
+                key="1"
+                className="h-36 flex items-center justify-center text-white font-bold rounded-lg"
+                style={{
+                  background: c.primaryColor,
+                  fontSize: c.fontSize,
+                  letterSpacing: c.letterSpacing,
+                }}
+              >
+                Slide 1
+              </div>,
+              <div
+                key="2"
+                className="h-36 flex items-center justify-center text-white font-bold rounded-lg"
+                style={{
+                  background: darkenHex(c.primaryColor, 0.1),
+                  fontSize: c.fontSize,
+                }}
+              >
+                Slide 2
+              </div>,
+              <div
+                key="3"
+                className="h-36 flex items-center justify-center text-white font-bold rounded-lg"
+                style={{
+                  background: darkenHex(c.primaryColor, 0.2),
+                  fontSize: c.fontSize,
+                }}
+              >
+                Slide 3
+              </div>,
             ]}
             theme={{ background: "#f3f4f6", indicator: c.primaryColor }}
           />
@@ -594,10 +669,19 @@ function LivePreview({ component, c }: { component: ComponentName; c: ComponentC
         <div style={{ minWidth: 220 }}>
           <Dropdown
             label={c.label}
-            items={[{ label: "Option 1", value: "1" }, { label: "Option 2", value: "2" }, { label: "Option 3", value: "3" }]}
-            theme={{ background: "#ffffff", text: c.textColor, border: c.primaryColor, hover: `${c.primaryColor}22` }}
+            items={[
+              { label: "Option 1", value: "1" },
+              { label: "Option 2", value: "2" },
+              { label: "Option 3", value: "3" },
+            ]}
+            theme={{
+              background: "#ffffff",
+              text: c.textColor,
+              border: c.primaryColor,
+              hover: `${c.primaryColor}22`,
+            }}
           />
-        </div>
+        </div>,
       );
 
     case "tabs":
@@ -605,22 +689,53 @@ function LivePreview({ component, c }: { component: ComponentName; c: ComponentC
         <div className="w-full">
           <Tabs
             tabs={[
-              { label: `${c.label} 1`, content: <p className="text-sm mt-2 p-2">Content for {c.label} 1</p> },
-              { label: `${c.label} 2`, content: <p className="text-sm mt-2 p-2">Content for {c.label} 2</p> },
-              { label: `${c.label} 3`, content: <p className="text-sm mt-2 p-2">Content for {c.label} 3</p> },
+              {
+                label: `${c.label} 1`,
+                content: (
+                  <p className="text-sm mt-2 p-2">Content for {c.label} 1</p>
+                ),
+              },
+              {
+                label: `${c.label} 2`,
+                content: (
+                  <p className="text-sm mt-2 p-2">Content for {c.label} 2</p>
+                ),
+              },
+              {
+                label: `${c.label} 3`,
+                content: (
+                  <p className="text-sm mt-2 p-2">Content for {c.label} 3</p>
+                ),
+              },
             ]}
-            theme={{ activeBg: c.primaryColor, inactiveBg: "#f3f4f6", text: "#111111", border: c.primaryColor }}
+            theme={{
+              activeBg: c.primaryColor,
+              inactiveBg: "#f3f4f6",
+              text: "#111111",
+              border: c.primaryColor,
+            }}
           />
-        </div>
+        </div>,
       );
 
     case "progress":
       return wrap(
         <div className="w-full space-y-4">
           <Progress value={65} showLabel color={c.primaryColor} />
-          <Progress value={80} variant="gradient" showLabel color={c.primaryColor} />
-          <Progress value={45} variant="striped" animated showLabel color={c.primaryColor} />
-        </div>
+          <Progress
+            value={80}
+            variant="gradient"
+            showLabel
+            color={c.primaryColor}
+          />
+          <Progress
+            value={45}
+            variant="striped"
+            animated
+            showLabel
+            color={c.primaryColor}
+          />
+        </div>,
       );
 
     case "pagination":
@@ -630,7 +745,7 @@ function LivePreview({ component, c }: { component: ComponentName; c: ComponentC
           totalPages={8}
           onPageChange={setPage}
           theme={{ active: c.primaryColor, borderRadius: c.borderRadius }}
-        />
+        />,
       );
 
     case "input":
@@ -648,36 +763,70 @@ function LivePreview({ component, c }: { component: ComponentName; c: ComponentC
               boxShadow: c.shadow !== "none" ? c.shadow : undefined,
             }}
           />
-        </div>
+        </div>,
       );
   }
 }
 
 // ─── Controls per component ───────────────────────────────────────────────────
 
-function ControlField({ label, children }: { label: string; children: React.ReactNode }) {
+function ControlField({
+  label,
+  children,
+}: {
+  label: string;
+  children: React.ReactNode;
+}) {
   return (
     <div>
-      <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1.5">{label}</label>
+      <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1.5">
+        {label}
+      </label>
       {children}
     </div>
   );
 }
 
-const sel = "w-full px-2 py-2 text-xs rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100";
+const sel =
+  "w-full px-2 py-2 text-xs rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100";
 
-function ColorField({ label, value, onChange }: { label: string; value: string; onChange: (v: string) => void }) {
+function ColorField({
+  label,
+  value,
+  onChange,
+}: {
+  label: string;
+  value: string;
+  onChange: (v: string) => void;
+}) {
   return (
     <ControlField label={label}>
       <div className="flex items-center gap-2">
-        <input type="color" value={value} onChange={(e) => onChange(e.target.value)} className="w-10 h-9 rounded-lg cursor-pointer border border-gray-200 dark:border-gray-700" />
-        <input type="text" value={value} onChange={(e) => /^#[0-9a-fA-F]{0,6}$/.test(e.target.value) && onChange(e.target.value)} className="w-28 px-2 py-2 text-xs font-mono rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100" />
+        <input
+          type="color"
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          className="w-10 h-9 rounded-lg cursor-pointer border border-gray-200 dark:border-gray-700"
+        />
+        <input
+          type="text"
+          value={value}
+          onChange={(e) =>
+            /^#[0-9a-fA-F]{0,6}$/.test(e.target.value) &&
+            onChange(e.target.value)
+          }
+          className="w-28 px-2 py-2 text-xs font-mono rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+        />
       </div>
     </ControlField>
   );
 }
 
-function Controls({ component, c, set }: {
+function Controls({
+  component,
+  c,
+  set,
+}: {
   component: ComponentName;
   c: ComponentCustomization;
   set: (v: Partial<ComponentCustomization>) => void;
@@ -685,23 +834,47 @@ function Controls({ component, c, set }: {
   // Shared controls visible for all
   const colorControls = (
     <>
-      <ColorField label="Primary Color" value={c.primaryColor} onChange={(v) => set({ primaryColor: v })} />
-      <ColorField label="Text Color" value={c.textColor} onChange={(v) => set({ textColor: v })} />
+      <ColorField
+        label="Primary Color"
+        value={c.primaryColor}
+        onChange={(v) => set({ primaryColor: v })}
+      />
+      <ColorField
+        label="Text Color"
+        value={c.textColor}
+        onChange={(v) => set({ textColor: v })}
+      />
     </>
   );
 
   const radiusControl = (
     <ControlField label="Border Radius">
-      <select value={c.borderRadius} onChange={(e) => set({ borderRadius: e.target.value })} className={sel}>
-        {RADIUS_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+      <select
+        value={c.borderRadius}
+        onChange={(e) => set({ borderRadius: e.target.value })}
+        className={sel}
+      >
+        {RADIUS_OPTIONS.map((o) => (
+          <option key={o.value} value={o.value}>
+            {o.label}
+          </option>
+        ))}
       </select>
     </ControlField>
   );
 
   const shadowControl = (
     <ControlField label="Shadow">
-      <select value={c.shadow} onChange={(e) => set({ shadow: e.target.value })} className={sel}>
-        {SHADOW_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+      <select
+        value={c.shadow}
+        onChange={(e) => set({ shadow: e.target.value })}
+        className={sel}
+      >
+        {SHADOW_OPTIONS.map((o) => (
+          <option key={o.value} value={o.value}>
+            {o.label}
+          </option>
+        ))}
       </select>
     </ControlField>
   );
@@ -709,18 +882,42 @@ function Controls({ component, c, set }: {
   const typographyControls = (
     <>
       <ControlField label="Font Size">
-        <select value={c.fontSize} onChange={(e) => set({ fontSize: e.target.value })} className={sel}>
-          {FONT_SIZES.map((s) => <option key={s} value={s}>{s}</option>)}
+        <select
+          value={c.fontSize}
+          onChange={(e) => set({ fontSize: e.target.value })}
+          className={sel}
+        >
+          {FONT_SIZES.map((s) => (
+            <option key={s} value={s}>
+              {s}
+            </option>
+          ))}
         </select>
       </ControlField>
       <ControlField label="Font Weight">
-        <select value={c.fontWeight} onChange={(e) => set({ fontWeight: e.target.value })} className={sel}>
-          {FONT_WEIGHTS.map((w) => <option key={w.value} value={w.value}>{w.label}</option>)}
+        <select
+          value={c.fontWeight}
+          onChange={(e) => set({ fontWeight: e.target.value })}
+          className={sel}
+        >
+          {FONT_WEIGHTS.map((w) => (
+            <option key={w.value} value={w.value}>
+              {w.label}
+            </option>
+          ))}
         </select>
       </ControlField>
       <ControlField label="Letter Spacing">
-        <select value={c.letterSpacing} onChange={(e) => set({ letterSpacing: e.target.value })} className={sel}>
-          {LETTER_SPACING.map((l) => <option key={l.value} value={l.value}>{l.label}</option>)}
+        <select
+          value={c.letterSpacing}
+          onChange={(e) => set({ letterSpacing: e.target.value })}
+          className={sel}
+        >
+          {LETTER_SPACING.map((l) => (
+            <option key={l.value} value={l.value}>
+              {l.label}
+            </option>
+          ))}
         </select>
       </ControlField>
     </>
@@ -728,8 +925,16 @@ function Controls({ component, c, set }: {
 
   const paddingControl = (
     <ControlField label="Padding">
-      <select value={c.padding} onChange={(e) => set({ padding: e.target.value })} className={sel}>
-        {PADDING_OPTIONS.map((p) => <option key={p.value} value={p.value}>{p.label}</option>)}
+      <select
+        value={c.padding}
+        onChange={(e) => set({ padding: e.target.value })}
+        className={sel}
+      >
+        {PADDING_OPTIONS.map((p) => (
+          <option key={p.value} value={p.value}>
+            {p.label}
+          </option>
+        ))}
       </select>
     </ControlField>
   );
@@ -737,13 +942,29 @@ function Controls({ component, c, set }: {
   const borderControls = (
     <>
       <ControlField label="Border Width">
-        <select value={c.borderWidth} onChange={(e) => set({ borderWidth: e.target.value })} className={sel}>
-          {BORDER_WIDTHS.map((w) => <option key={w} value={w}>{w}</option>)}
+        <select
+          value={c.borderWidth}
+          onChange={(e) => set({ borderWidth: e.target.value })}
+          className={sel}
+        >
+          {BORDER_WIDTHS.map((w) => (
+            <option key={w} value={w}>
+              {w}
+            </option>
+          ))}
         </select>
       </ControlField>
       <ControlField label="Border Style">
-        <select value={c.borderStyle} onChange={(e) => set({ borderStyle: e.target.value })} className={sel}>
-          {BORDER_STYLES.map((s) => <option key={s} value={s}>{s}</option>)}
+        <select
+          value={c.borderStyle}
+          onChange={(e) => set({ borderStyle: e.target.value })}
+          className={sel}
+        >
+          {BORDER_STYLES.map((s) => (
+            <option key={s} value={s}>
+              {s}
+            </option>
+          ))}
         </select>
       </ControlField>
     </>
@@ -751,38 +972,117 @@ function Controls({ component, c, set }: {
 
   const labelControl = (lbl: string) => (
     <ControlField label={lbl}>
-      <input type="text" value={c.label} onChange={(e) => set({ label: e.target.value })} className={sel} />
+      <input
+        type="text"
+        value={c.label}
+        onChange={(e) => set({ label: e.target.value })}
+        className={sel}
+      />
     </ControlField>
   );
 
   switch (component) {
     case "button":
-      return <>{colorControls}{radiusControl}{typographyControls}{paddingControl}{shadowControl}{borderControls}{labelControl("Button Label")}</>;
+      return (
+        <>
+          {colorControls}
+          {radiusControl}
+          {typographyControls}
+          {paddingControl}
+          {shadowControl}
+          {borderControls}
+          {labelControl("Button Label")}
+        </>
+      );
     case "card":
-      return <>{colorControls}{radiusControl}{shadowControl}{paddingControl}{borderControls}{labelControl("Card Title")}</>;
+      return (
+        <>
+          {colorControls}
+          {radiusControl}
+          {shadowControl}
+          {paddingControl}
+          {borderControls}
+          {labelControl("Card Title")}
+        </>
+      );
     case "input":
-      return <>{colorControls}{radiusControl}{typographyControls}{paddingControl}{shadowControl}{borderControls}{labelControl("Placeholder")}</>;
+      return (
+        <>
+          {colorControls}
+          {radiusControl}
+          {typographyControls}
+          {paddingControl}
+          {shadowControl}
+          {borderControls}
+          {labelControl("Placeholder")}
+        </>
+      );
     case "dialog":
-      return <>{colorControls}{radiusControl}{shadowControl}{paddingControl}{labelControl("Dialog Title")}</>;
+      return (
+        <>
+          {colorControls}
+          {radiusControl}
+          {shadowControl}
+          {paddingControl}
+          {labelControl("Dialog Title")}
+        </>
+      );
     case "tabs":
-      return <>{colorControls}{radiusControl}{typographyControls}{labelControl("Tab Label")}</>;
+      return (
+        <>
+          {colorControls}
+          {radiusControl}
+          {typographyControls}
+          {labelControl("Tab Label")}
+        </>
+      );
     case "progress":
-      return <>{colorControls}{radiusControl}</>;
+      return (
+        <>
+          {colorControls}
+          {radiusControl}
+        </>
+      );
     case "pagination":
-      return <>{colorControls}{radiusControl}{typographyControls}</>;
+      return (
+        <>
+          {colorControls}
+          {radiusControl}
+          {typographyControls}
+        </>
+      );
     case "carousel":
-      return <>{colorControls}{typographyControls}</>;
+      return (
+        <>
+          {colorControls}
+          {typographyControls}
+        </>
+      );
     case "dropdown":
-      return <>{colorControls}{radiusControl}{typographyControls}{shadowControl}{labelControl("Dropdown Label")}</>;
+      return (
+        <>
+          {colorControls}
+          {radiusControl}
+          {typographyControls}
+          {shadowControl}
+          {labelControl("Dropdown Label")}
+        </>
+      );
     case "navbar":
-      return <>{colorControls}{shadowControl}</>;
+      return (
+        <>
+          {colorControls}
+          {shadowControl}
+        </>
+      );
   }
 }
 
 // ─── Main panel ───────────────────────────────────────────────────────────────
 
 export default function ComponentPersonalizationPanel() {
-  const { getCustomization, setCustomization, resetCustomization } = useComponentCustom();
+  const { getCustomization, setCustomization, resetCustomization } =
+    useComponentCustom();
   const [selected, setSelected] = useState<ComponentName>("button");
   const [copyFormat, setCopyFormat] = useState<Format>("react");
   const [copied, setCopied] = useState(false);
@@ -790,7 +1090,8 @@ export default function ComponentPersonalizationPanel() {
   const c = getCustomization(selected);
   const code = generateCode(selected, c, copyFormat);
 
-  const set = (v: Partial<ComponentCustomization>) => setCustomization(selected, v);
+  const set = (v: Partial<ComponentCustomization>) =>
+    setCustomization(selected, v);
 
   const handleCopy = () => {
     navigator.clipboard.writeText(code).then(() => {
@@ -803,7 +1104,9 @@ export default function ComponentPersonalizationPanel() {
     <div className="space-y-6">
       {/* Component selector */}
       <div>
-        <p className="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-3">Select a Component</p>
+        <p className="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-3">
+          Select a Component
+        </p>
         <div className="grid grid-cols-5 sm:grid-cols-10 gap-2">
           {ALL_COMPONENTS.map((comp) => {
             const cc = getCustomization(comp);
@@ -818,8 +1121,13 @@ export default function ComponentPersonalizationPanel() {
                     : "border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:border-gray-400"
                 }`}
               >
-                <span className="w-5 h-5 rounded-full shadow-sm shrink-0 border border-white/30 dark:border-black/20" style={{ background: cc.primaryColor }} />
-                <span className="leading-tight text-center text-[10px]">{COMP_LABEL[comp]}</span>
+                <span
+                  className="w-5 h-5 rounded-full shadow-sm shrink-0 border border-white/30 dark:border-black/20"
+                  style={{ background: cc.primaryColor }}
+                />
+                <span className="leading-tight text-center text-[10px]">
+                  {COMP_LABEL[comp]}
+                </span>
               </button>
             );
           })}
@@ -831,17 +1139,28 @@ export default function ComponentPersonalizationPanel() {
         {/* Controls */}
         <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-5 space-y-4 max-h-[600px] overflow-y-auto">
           <div className="flex items-center justify-between sticky top-0 bg-white dark:bg-gray-900 pb-2 border-b border-gray-100 dark:border-gray-800">
-            <h3 className="font-semibold text-gray-900 dark:text-white text-sm">Customize {COMP_LABEL[selected]}</h3>
-            <button onClick={() => resetCustomization(selected)} className="text-xs text-gray-400 hover:text-red-500 transition-colors">Reset</button>
+            <h3 className="font-semibold text-gray-900 dark:text-white text-sm">
+              Customize {COMP_LABEL[selected]}
+            </h3>
+            <button
+              onClick={() => resetCustomization(selected)}
+              className="text-xs text-gray-400 hover:text-red-500 transition-colors"
+            >
+              Reset
+            </button>
           </div>
           <Controls component={selected} c={c} set={set} />
         </div>
 
         {/* Live preview */}
         <div className="space-y-2">
-          <p className="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider">Live Preview</p>
+          <p className="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider">
+            Live Preview
+          </p>
           <LivePreview key={`${selected}-preview`} component={selected} c={c} />
-          <p className="text-xs text-gray-400 dark:text-gray-500">Changes reflect here and on the Components page in real time.</p>
+          <p className="text-xs text-gray-400 dark:text-gray-500">
+            Changes reflect here and on the Components page in real time.
+          </p>
         </div>
       </div>
 
@@ -859,7 +1178,11 @@ export default function ComponentPersonalizationPanel() {
                     : "text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
                 }`}
               >
-                {fmt === "react" ? "React" : fmt === "html" ? "HTML" : "Angular"}
+                {fmt === "react"
+                  ? "React"
+                  : fmt === "html"
+                    ? "HTML"
+                    : "Angular"}
                 {copyFormat === fmt && (
                   <div className="absolute -bottom-4 left-0 right-0 h-0.5 bg-indigo-600 rounded-full" />
                 )}
@@ -868,9 +1191,9 @@ export default function ComponentPersonalizationPanel() {
           </div>
         </div>
         <div className="p-6 bg-gray-50/30 dark:bg-gray-900/30">
-          <CodeBlock 
-            code={code} 
-            language={copyFormat} 
+          <CodeBlock
+            code={code}
+            language={copyFormat}
             className="border-none shadow-none bg-transparent"
           />
         </div>

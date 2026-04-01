@@ -14,8 +14,8 @@ export default function DialogPreview() {
     return `{{ ${entries.join(", ")} } as React.CSSProperties}`;
   }
 
-  const exportCode = `import React, { useState } from 'react';\nimport { Dialog } from '@your-scope/newgen-ui';\n\nexport default function CustomDialog(){\n  const [open, setOpen] = useState(false);\n  return (\n    <div style=${toStyleObjectString(
-    vars
+  const exportCode = `import React, { useState } from 'react';\nimport { Dialog } from '@rajgupta2509/next-gen-builder';\n\nexport default function CustomDialog(){\n  const [open, setOpen] = useState(false);\n  return (\n    <div style=${toStyleObjectString(
+    vars,
   )}>\n      <button onClick={() => setOpen(true)}>Open Dialog</button>\n      <Dialog open={open} onClose={() => setOpen(false)} title="Custom Dialog">\n        <p>Your dialog content here.</p>\n      </Dialog>\n    </div>\n  );\n}`;
 
   return (
@@ -176,9 +176,9 @@ export default function DialogPreview() {
         <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">
           Usage
         </h3>
-        <CodeBlock 
-          code={`import { Dialog } from '@your-scope/newgen-ui';\n\n// Basic usage\n<Dialog open={isOpen} onClose={() => setIsOpen(false)} title="Dialog Title">\n  <p>Your content here.</p>\n</Dialog>\n\n// Custom theme\n<Dialog \n  open={isOpen} \n  onClose={() => setIsOpen(false)} \n  title="Custom Dialog"\n  theme={{\n    primary: "#10b981",\n    primary600: "#059669",\n    background: "#f0fdf4"\n  }}\n>\n  <p>Custom themed content.</p>\n</Dialog>\n\n// Without title\n<Dialog open={isOpen} onClose={() => setIsOpen(false)}>\n  <p>Content without a title.</p>\n</Dialog>`} 
-          language="jsx" 
+        <CodeBlock
+          code={`import { Dialog } from '@rajgupta2509/next-gen-builder';\n\n// Basic usage\n<Dialog open={isOpen} onClose={() => setIsOpen(false)} title="Dialog Title">\n  <p>Your content here.</p>\n</Dialog>\n\n// Custom theme\n<Dialog \n  open={isOpen} \n  onClose={() => setIsOpen(false)} \n  title="Custom Dialog"\n  theme={{\n    primary: "#10b981",\n    primary600: "#059669",\n    background: "#f0fdf4"\n  }}\n>\n  <p>Custom themed content.</p>\n</Dialog>\n\n// Without title\n<Dialog open={isOpen} onClose={() => setIsOpen(false)}>\n  <p>Content without a title.</p>\n</Dialog>`}
+          language="jsx"
         />
       </div>
 

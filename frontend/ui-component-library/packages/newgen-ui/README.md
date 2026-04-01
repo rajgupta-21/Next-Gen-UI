@@ -1,19 +1,29 @@
-# @your-scope/newgen-ui
+# next-gen-ui
 
-Small component package scaffolded from the project. To build locally:
+🚀 AI-powered UI component library with multi-framework export support.
 
-1. From the repo root:
+A modern React component library designed for fast UI development with clean, reusable components.
+
+---
+
+## ✨ Features
+
+- ⚡ Ready-to-use UI components
+- 🎨 Clean and reusable design
+- 📦 Lightweight and optimized
+- 🔥 Built with React + TypeScript
+- 🚀 Easy to integrate
+
+---
+
+## 📦 Installation
 
 ```bash
-cd frontend/ui-component-library/packages/newgen-ui
-pnpm install # or npm install
-pnpm build
+npm install @rajgupta2509/next-gen-builder
 ```
 
-2. Publish:
+or with yarn:
 
 ```bash
-npm publish --access public
+yarn add @rajgupta2509/next-gen-builder
 ```
-
-Replace `@your-scope` and package name as appropriate.

@@ -25,18 +25,24 @@ import {
   PreviewTestimonial,
   PreviewText,
 } from "@/components/PreviewComp";
+import { deployToNetlifyAuth, downloadAsZip } from "@/lib/deploy";
 import {
   Box,
   Check,
   ChevronRight,
   Component as CompIcon,
   Copy,
+  Download,
   Edit2,
+  ExternalLink,
+  Globe,
   Layout,
   Maximize2,
   RefreshCcw,
   Settings,
-  Trash2
+  Trash2,
+  Upload,
+  X,
 } from "lucide-react";
 import { useState } from "react";
 
@@ -113,7 +119,7 @@ interface Field {
   name: string;
   label: string;
   type: "text" | "color" | "textarea" | "select" | "number" | "checkbox";
-  options?: string[]; // for select
+  options?: string[];
 }
 
 interface NavLink {
@@ -126,20 +132,28 @@ const ReactWebsiteBuilder = () => {
   const [components, setComponents] = useState<ComponentData[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [copyStatus, setCopyStatus] = useState(false);
-  const [rightPanelTab, setRightPanelTab] = useState<"properties" | "history">("properties");
+  const [rightPanelTab, setRightPanelTab] = useState<
+    "properties" | "history" | "deploy"
+  >("properties");
   const [isSidebarVisible, setIsSidebarVisible] = useState(true);
   const [isRightPanelVisible, setIsRightPanelVisible] = useState(true);
-  const [history, setHistory] = useState<{id: string, action: string, time: string, type: string}[]>([]);
+  const [history, setHistory] = useState<
+    { id: string; action: string; time: string; type: string }[]
+  >([]);
 
   const addToHistory = (action: string, type: string) => {
     const newItem = {
       id: generateId(),
       action,
       type,
-      time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      time: new Date().toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+      }),
     };
-    setHistory(prev => [newItem, ...prev].slice(0, 20));
+    setHistory((prev) => [newItem, ...prev].slice(0, 20));
   };
+
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editProps, setEditProps] = useState<ComponentProps>({});
   const [dragOverId, setDragOverId] = useState<string | null>(null);
@@ -148,9 +162,27 @@ const ReactWebsiteBuilder = () => {
   >(null);
   const [showNavLinkForm, setShowNavLinkForm] = useState(false);
   const [newNavLink, setNewNavLink] = useState({ label: "", href: "" });
-  const [selectedLang, setSelectedLang] = useState<"react" | "html" | "angularjs">("react");
 
-  // --- Preview Components ---
+  const [selectedTab, setSelectedTab] = useState<
+    "react" | "html" | "angularjs"
+  >("react");
+
+  const [deployModal, setDeployModal] = useState<{
+    open: boolean;
+    url: string | null;
+    method: string;
+    error: string | null;
+  }>({ open: false, url: null, method: "", error: null });
+
+  const [deployLoading, setDeployLoading] = useState(false);
+  const [netlifyToken, setNetlifyToken] = useState(() => {
+    if (typeof window !== "undefined") {
+      return localStorage.getItem("netlify_token") || "";
+    }
+    return "";
+  });
+  const [tokenInput, setTokenInput] = useState("");
+  const [netlifySiteId, setNetlifySiteId] = useState("");
 
   // --- Templates ---
 
@@ -803,7 +835,7 @@ const ReactWebsiteBuilder = () => {
         const tmpl = componentTemplates[node.type];
         const indent = "  ".repeat(level);
 
-        let propsString = Object.entries(node.props)
+        const propsString = Object.entries(node.props)
           .map(([key, val]) => {
             if (key === "children") return "";
             if (typeof val === "string") return `${key}="${val}"`;
@@ -839,21 +871,23 @@ ${indent}</${tmpl.name.replace(/\s/g, "")}>`;
   const generateReactCode = () => {
     const jsxContent = generateJSXRecursive(components);
     const styleSet = new Set(getSubStyles(components));
-    
-    // Collect all unique component names for imports
+
     const usedComponentNames = new Set<string>();
     const collectNames = (nodes: ComponentData[]) => {
-      nodes.forEach(node => {
-        usedComponentNames.add(componentTemplates[node.type].name.replace(/\s/g, ""));
+      nodes.forEach((node) => {
+        usedComponentNames.add(
+          componentTemplates[node.type].name.replace(/\s/g, ""),
+        );
         collectNames(node.children);
       });
     };
     collectNames(components);
-    
+
     const importList = Array.from(usedComponentNames).sort().join(", ");
-    const imports = usedComponentNames.size > 0 
-      ? `import { ${importList} } from "@/components/PreviewComp";`
-      : "";
+    const imports =
+      usedComponentNames.size > 0
+        ? `import { ${importList} } from "@/components/PreviewComp";`
+        : "";
 
     const fullJsx = `"use client";
 import React from "react";
@@ -875,107 +909,152 @@ export default GeneratedWebsite;`;
     };
   };
 
-  // --- HTML Code Generator ---
-
   const generateHTMLNode = (node: ComponentData, level = 2): string => {
     const p = node.props;
     const indent = "  ".repeat(level);
+
+    // Always recurse children — empty string is fine, never skip
     const childrenHTML =
       node.children.length > 0
-        ? "\n" + node.children.map((c) => generateHTMLNode(c, level + 1)).join("\n") + "\n" + indent
+        ? "\n" +
+          node.children.map((c) => generateHTMLNode(c, level + 1)).join("\n") +
+          "\n" +
+          indent
         : "";
 
     switch (node.type) {
+      // ── Basic ────────────────────────────────────────────────────────────────
+
       case "button":
         return `${indent}<button class="btn-primary" style="background:${p.bgColor};color:${p.textColor}">${p.text}</button>`;
+
       case "secondaryButton":
         return `${indent}<button class="btn-secondary" style="border:2px solid ${p.borderColor};color:${p.textColor}">${p.text}</button>`;
+
       case "input":
         return `${indent}<div class="input-group">
 ${indent}  <label class="input-label">${p.label}</label>
 ${indent}  <input class="input-field" placeholder="${p.placeholder}" />
 ${indent}</div>`;
+
       case "heading":
         return `${indent}<h2 class="heading-primary" style="color:${p.color};font-size:${p.fontSize}">${p.text}</h2>`;
+
       case "text":
         return `${indent}<p class="text-body" style="color:${p.color};font-size:${p.fontSize}">${p.text}</p>`;
+
       case "image":
         return `${indent}<img class="img-responsive" src="${p.src}" alt="${p.alt}" style="width:${p.width};height:${p.height};border-radius:${p.borderRadius}" />`;
+
       case "avatar":
         return `${indent}<img class="avatar" src="${p.src}" style="width:${p.size};height:${p.size}" alt="Avatar" />`;
+
       case "badge":
         return `${indent}<span class="badge" style="background:${p.color};color:${p.textColor}">${p.text}</span>`;
+
       case "divider":
         return `${indent}<hr style="border:${p.thickness} solid ${p.color};margin:${p.margin} 0" />`;
+
       case "spacer":
         return `${indent}<div style="height:${p.height}"></div>`;
+
       case "quote":
         return `${indent}<blockquote class="quote" style="color:${p.textColor};border-color:${p.borderColor}">
 ${indent}  <p>${p.text}</p>
 ${indent}  <cite class="quote-author">${p.author}</cite>
 ${indent}</blockquote>`;
+
+      // ── Layout containers ────────────────────────────────────────────────────
+
       case "navbar": {
-        const links = (p.navLinks || []).map((l: any) =>
-          `${indent}    <a class="navbar-link" href="${l.href}" style="color:${p.textColor}">${l.label}</a>`
-        ).join("\n");
+        // FIX: navLinks now rendered directly, AND dropped children go in the
+        // right-hand slot (e.g. a CTA button dragged into the navbar).
+        const links = (p.navLinks || [])
+          .map(
+            (l: { id: string; label: string; href: string }) =>
+              `${indent}    <a class="navbar-link" href="${l.href}" style="color:${p.textColor}">${l.label}</a>`,
+          )
+          .join("\n");
+
         return `${indent}<nav class="navbar" style="background:${p.bgColor};color:${p.textColor}">
 ${indent}  <span class="navbar-brand">${p.brand}</span>
 ${indent}  <div class="navbar-links">
 ${links}
 ${indent}  </div>
-${indent}  <div>${childrenHTML}</div>
+${indent}  <div class="navbar-actions">${childrenHTML}</div>
 ${indent}</nav>`;
       }
+
       case "hero":
+        // FIX: children (buttons, badges, etc.) render inside hero-actions
         return `${indent}<section class="hero" style="background:linear-gradient(135deg,${p.gradientStart},${p.gradientEnd})">
 ${indent}  <h1 class="hero-title">${p.title}</h1>
 ${indent}  <p class="hero-subtitle">${p.subtitle}</p>
 ${indent}  <div class="hero-actions">${childrenHTML}</div>
 ${indent}</section>`;
+
       case "container":
-        return `${indent}<div class="container" style="padding:${p.padding};background:${p.bgColor}">${childrenHTML}</div>`;
+        // FIX: children always injected — previously an empty container rendered
+        // with no inner content at all
+        return `${indent}<div class="container" style="padding:${p.padding};background:${p.bgColor === "transparent" ? "transparent" : p.bgColor}">${childrenHTML}</div>`;
+
       case "card":
         return `${indent}<div class="card" style="background:${p.bgColor}">
 ${indent}  <div class="card-title">${p.title}</div>
 ${indent}  <div class="card-body">${childrenHTML}</div>
 ${indent}</div>`;
+
       case "grid":
+        // FIX: children are the actual grid cells — they must render inside the
+        // grid div, not be omitted when the string is non-empty
         return `${indent}<div class="grid" style="grid-template-columns:repeat(${p.columns},1fr);gap:${p.gap}">${childrenHTML}</div>`;
+
       case "flexRow":
         return `${indent}<div class="flex-row" style="justify-content:${p.justify};gap:${p.gap}">${childrenHTML}</div>`;
+
+      case "section":
+        return `${indent}<section class="section" style="background:${p.bgColor};padding:${p.padding}">${childrenHTML}</section>`;
+
       case "footer":
+        // FIX: children render before the copyright line so any components
+        // dropped into the footer (links, social icons, etc.) are included
         return `${indent}<footer class="footer" style="background:${p.bgColor};color:${p.textColor}">
 ${indent}  <div class="footer-content">
 ${childrenHTML}
 ${indent}    <p>${p.copyright}</p>
 ${indent}  </div>
 ${indent}</footer>`;
-      case "section":
-        return `${indent}<section class="section" style="background:${p.bgColor};padding:${p.padding}">${childrenHTML}</section>`;
+
+      // ── Components ───────────────────────────────────────────────────────────
+
       case "testimonial":
         return `${indent}<div class="testimonial" style="background:${p.bgColor};color:${p.textColor};border-color:${p.borderColor}">
 ${indent}  <p>${p.content}</p>
 ${indent}  <div class="testimonial-name">${p.name}</div>
 ${indent}  <div class="testimonial-title">${p.title}</div>
 ${indent}</div>`;
+
       case "featureBox":
         return `${indent}<div class="feature-box" style="background:${p.bgColor}">
 ${indent}  <div class="feature-icon" style="font-size:${p.iconSize}">${p.icon}</div>
 ${indent}  <div class="feature-title" style="color:${p.titleColor}">${p.title}</div>
 ${indent}  <div class="feature-description" style="color:${p.descColor}">${p.description}</div>
 ${indent}</div>`;
+
       case "cta":
+        // FIX: children (extra buttons, badges) render after the default button
         return `${indent}<div class="cta" style="background:${p.bgColor};color:${p.textColor};padding:${p.padding};border-radius:${p.borderRadius}">
 ${indent}  <h2 class="cta-title" style="font-size:${p.titleSize}">${p.title}</h2>
 ${indent}  <p class="cta-subtitle" style="font-size:${p.subtitleSize}">${p.subtitle}</p>
-${indent}  <button style="background:${p.buttonBg};color:${p.textColor};padding:10px 24px;border:none;border-radius:6px;cursor:pointer">${p.buttonText}</button>
-${indent}  <div>${childrenHTML}</div>
-${indent}</div>`;
+${indent}  <button style="background:${p.buttonBg};color:${p.textColor};padding:10px 24px;border:none;border-radius:6px;cursor:pointer;font-weight:600">${p.buttonText}</button>
+${childrenHTML}</div>`;
+
       case "stats":
         return `${indent}<div class="stats" style="background:${p.bgColor};padding:${p.padding};border-radius:${p.borderRadius}">
 ${indent}  <div class="stats-value" style="color:${p.valueColor};font-size:${p.valueSize}">${p.value}</div>
 ${indent}  <div class="stats-label" style="color:${p.labelColor};font-size:${p.labelSize}">${p.label}</div>
 ${indent}</div>`;
+
       default:
         return `${indent}<div>${childrenHTML}</div>`;
     }
@@ -993,10 +1072,15 @@ ${indent}</div>`;
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Created with NewGen UI</title>
   <style>
-${CORE_LIBRARY_CSS.split("\n").map(l => "    " + l).join("\n")}
+${CORE_LIBRARY_CSS.split("\n")
+  .map((l) => "    " + l)
+  .join("\n")}
 
     /* Custom styles for this template */
-${customCssStr.split("\n").map(l => "    " + l).join("\n")}
+${customCssStr
+  .split("\n")
+  .map((l) => "    " + l)
+  .join("\n")}
   </style>
 </head>
 <body style="margin: 0; padding: 0;">
@@ -1012,7 +1096,12 @@ ${bodyHTML}
     const indent = "  ".repeat(level);
     const childrenHTML =
       node.children.length > 0
-        ? "\n" + node.children.map((c) => generateAngularNode(c, level + 1)).join("\n") + "\n" + indent
+        ? "\n" +
+          node.children
+            .map((c) => generateAngularNode(c, level + 1))
+            .join("\n") +
+          "\n" +
+          indent
         : "";
 
     switch (node.type) {
@@ -1045,9 +1134,12 @@ ${indent}  <p>{{ctrl.${node.id}_text}}</p>
 ${indent}  <cite class="quote-author">{{ctrl.${node.id}_author}}</cite>
 ${indent}</blockquote>`;
       case "navbar": {
-        const links = (p.navLinks || []).map((l: any) =>
-          `${indent}    <a class="navbar-link" href="${l.href}" style="color:${p.textColor}">${l.label}</a>`
-        ).join("\n");
+        const links = (p.navLinks || [])
+          .map(
+            (l: NavLink) =>
+              `${indent}    <a class="navbar-link" href="${l.href}" style="color:${p.textColor}">${l.label}</a>`,
+          )
+          .join("\n");
         return `${indent}<nav class="navbar" style="background:${p.bgColor};color:${p.textColor}">
 ${indent}  <span class="navbar-brand">{{ctrl.${node.id}_brand}}</span>
 ${indent}  <div class="navbar-links">
@@ -1116,34 +1208,73 @@ ${indent}</div>`;
     const visit = (node: ComponentData) => {
       const p = node.props;
       switch (node.type) {
-        case "button": lines.push(`        this.${node.id}_text = '${p.text}';`); break;
-        case "secondaryButton": lines.push(`        this.${node.id}_text = '${p.text}';`); break;
-        case "input": lines.push(`        this.${node.id}_label = '${p.label}';
-        this.${node.id}_value = '';`); break;
-        case "heading": lines.push(`        this.${node.id}_text = '${p.text}';`); break;
-        case "text": lines.push(`        this.${node.id}_text = '${p.text}';`); break;
-        case "image": lines.push(`        this.${node.id}_src = '${p.src}';`); break;
-        case "avatar": lines.push(`        this.${node.id}_src = '${p.src}';`); break;
-        case "badge": lines.push(`        this.${node.id}_text = '${p.text}';`); break;
-        case "quote": lines.push(`        this.${node.id}_text = '${p.text}';
-        this.${node.id}_author = '${p.author}';`); break;
-        case "navbar": lines.push(`        this.${node.id}_brand = '${p.brand}';`); break;
-        case "hero": lines.push(`        this.${node.id}_title = '${p.title}';
-        this.${node.id}_subtitle = '${p.subtitle}';`); break;
-        case "card": lines.push(`        this.${node.id}_title = '${p.title}';`); break;
-        case "footer": lines.push(`        this.${node.id}_copyright = '${p.copyright}';`); break;
-        case "testimonial": lines.push(`        this.${node.id}_content = '${p.content}';
-        this.${node.id}_name = '${p.name}';
-        this.${node.id}_title = '${p.title}';`); break;
-        case "featureBox": lines.push(`        this.${node.id}_icon = '${p.icon}';
-        this.${node.id}_title = '${p.title}';
-        this.${node.id}_description = '${p.description}';`); break;
-        case "cta": lines.push(`        this.${node.id}_title = '${p.title}';
-        this.${node.id}_subtitle = '${p.subtitle}';
-        this.${node.id}_buttonText = '${p.buttonText}';`); break;
-        case "stats": lines.push(`        this.${node.id}_value = '${p.value}';
-        this.${node.id}_label = '${p.label}';`); break;
-        default: break;
+        case "button":
+          lines.push(`        this.${node.id}_text = '${p.text}';`);
+          break;
+        case "secondaryButton":
+          lines.push(`        this.${node.id}_text = '${p.text}';`);
+          break;
+        case "input":
+          lines.push(
+            `        this.${node.id}_label = '${p.label}';\n        this.${node.id}_value = '';`,
+          );
+          break;
+        case "heading":
+          lines.push(`        this.${node.id}_text = '${p.text}';`);
+          break;
+        case "text":
+          lines.push(`        this.${node.id}_text = '${p.text}';`);
+          break;
+        case "image":
+          lines.push(`        this.${node.id}_src = '${p.src}';`);
+          break;
+        case "avatar":
+          lines.push(`        this.${node.id}_src = '${p.src}';`);
+          break;
+        case "badge":
+          lines.push(`        this.${node.id}_text = '${p.text}';`);
+          break;
+        case "quote":
+          lines.push(
+            `        this.${node.id}_text = '${p.text}';\n        this.${node.id}_author = '${p.author}';`,
+          );
+          break;
+        case "navbar":
+          lines.push(`        this.${node.id}_brand = '${p.brand}';`);
+          break;
+        case "hero":
+          lines.push(
+            `        this.${node.id}_title = '${p.title}';\n        this.${node.id}_subtitle = '${p.subtitle}';`,
+          );
+          break;
+        case "card":
+          lines.push(`        this.${node.id}_title = '${p.title}';`);
+          break;
+        case "footer":
+          lines.push(`        this.${node.id}_copyright = '${p.copyright}';`);
+          break;
+        case "testimonial":
+          lines.push(
+            `        this.${node.id}_content = '${p.content}';\n        this.${node.id}_name = '${p.name}';\n        this.${node.id}_title = '${p.title}';`,
+          );
+          break;
+        case "featureBox":
+          lines.push(
+            `        this.${node.id}_icon = '${p.icon}';\n        this.${node.id}_title = '${p.title}';\n        this.${node.id}_description = '${p.description}';`,
+          );
+          break;
+        case "cta":
+          lines.push(
+            `        this.${node.id}_title = '${p.title}';\n        this.${node.id}_subtitle = '${p.subtitle}';\n        this.${node.id}_buttonText = '${p.buttonText}';`,
+          );
+          break;
+        case "stats":
+          lines.push(
+            `        this.${node.id}_value = '${p.value}';\n        this.${node.id}_label = '${p.label}';`,
+          );
+          break;
+        default:
+          break;
       }
       node.children.forEach(visit);
     };
@@ -1165,10 +1296,15 @@ ${indent}</div>`;
   <title>Created with NewGen UI (AngularJS)</title>
   <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
   <style>
-${CORE_LIBRARY_CSS.split("\n").map(l => "    " + l).join("\n")}
+${CORE_LIBRARY_CSS.split("\n")
+  .map((l) => "    " + l)
+  .join("\n")}
 
     /* Custom styles for this template */
-${customCssStr.split("\n").map(l => "    " + l).join("\n")}
+${customCssStr
+  .split("\n")
+  .map((l) => "    " + l)
+  .join("\n")}
   </style>
 </head>
 <body ng-controller="MainCtrl as ctrl" style="margin: 0; padding: 0;">
@@ -1187,9 +1323,11 @@ ${scopeInit}
 
   const { jsx, css } = generateReactCode();
 
+  // FIX: was broken as `selectedL\n      ang` referencing undefined `selectedLang`.
+  // Corrected to use `selectedTab` which is the actual state variable.
   const getActiveCode = () => {
-    if (selectedLang === "html") return generateHTMLCode();
-    if (selectedLang === "angularjs") return generateAngularCode();
+    if (selectedTab === "html") return generateHTMLCode();
+    if (selectedTab === "angularjs") return generateAngularCode();
     return `// React JSX\n${jsx}\n\n/* CSS */\n${css}`;
   };
 
@@ -1212,8 +1350,8 @@ ${scopeInit}
         <div
           key={node.id}
           className={`group/item relative transition-all duration-200 outline-none
-            ${isSelected ? 'ring-2 ring-blue-500 z-50' : 'hover:ring-1 hover:ring-blue-400/50'}
-            ${isDragOver ? 'bg-blue-500/5 ring-2 ring-dashed ring-blue-400' : ''}`}
+            ${isSelected ? "ring-2 ring-blue-500 z-50" : "hover:ring-1 hover:ring-blue-400/50"}
+            ${isDragOver ? "bg-blue-500/5 ring-2 ring-dashed ring-blue-400" : ""}`}
           onClick={(e) => {
             e.stopPropagation();
             setSelectedId(node.id);
@@ -1227,38 +1365,44 @@ ${scopeInit}
         >
           {isSelected && (
             <div className="absolute top-0 left-0 w-full h-full pointer-events-none z-[60]">
-               {/* Selection Label */}
-               <div className="absolute -top-7 left-0 bg-blue-600 text-white text-[10px] font-black px-2.5 py-1 rounded-t-lg pointer-events-auto shadow-lg shadow-blue-500/30 uppercase tracking-widest flex items-center gap-2 border-t border-x border-white/20">
-                  <CompIcon size={10} className="text-white/80" />
-                  {template.name}
-               </div>
+              {/* Selection Label */}
+              <div className="absolute -top-7 left-0 bg-blue-600 text-white text-[10px] font-black px-2.5 py-1 rounded-t-lg pointer-events-auto shadow-lg shadow-blue-500/30 uppercase tracking-widest flex items-center gap-2 border-t border-x border-white/20">
+                <CompIcon size={10} className="text-white/80" />
+                {template.name}
+              </div>
 
-               {/* Action Buttons */}
-               <div className="absolute top-2 right-2 flex gap-1.5 pointer-events-auto">
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      startEditing(node.id, e);
-                      setRightPanelTab("properties");
-                      setIsRightPanelVisible(true);
-                    }}
-                    className="w-8 h-8 bg-white/95 backdrop-blur-md text-blue-600 border border-blue-100 rounded-xl flex items-center justify-center hover:bg-blue-600 hover:text-white transition-all shadow-xl hover:scale-110 active:scale-95 group/btn"
-                    title="Edit Properties"
-                  >
-                    <Edit2 size={14} className="group-hover/btn:rotate-12 transition-transform" />
-                  </button>
-                  <button
-                    onClick={(e) => removeComponent(node.id, e)}
-                    className="w-8 h-8 bg-red-500/95 backdrop-blur-md text-white rounded-xl flex items-center justify-center hover:bg-red-600 transition-all shadow-xl hover:scale-110 active:scale-95 group/btn"
-                    title="Delete Component"
-                  >
-                    <Trash2 size={14} className="group-hover/btn:-rotate-12 transition-transform" />
-                  </button>
-               </div>
+              {/* Action Buttons */}
+              <div className="absolute top-2 right-2 flex gap-1.5 pointer-events-auto">
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    startEditing(node.id, e);
+                    setRightPanelTab("properties");
+                    setIsRightPanelVisible(true);
+                  }}
+                  className="w-8 h-8 bg-white/95 backdrop-blur-md text-blue-600 border border-blue-100 rounded-xl flex items-center justify-center hover:bg-blue-600 hover:text-white transition-all shadow-xl hover:scale-110 active:scale-95 group/btn"
+                  title="Edit Properties"
+                >
+                  <Edit2
+                    size={14}
+                    className="group-hover/btn:rotate-12 transition-transform"
+                  />
+                </button>
+                <button
+                  onClick={(e) => removeComponent(node.id, e)}
+                  className="w-8 h-8 bg-red-500/95 backdrop-blur-md text-white rounded-xl flex items-center justify-center hover:bg-red-600 transition-all shadow-xl hover:scale-110 active:scale-95 group/btn"
+                  title="Delete Component"
+                >
+                  <Trash2
+                    size={14}
+                    className="group-hover/btn:-rotate-12 transition-transform"
+                  />
+                </button>
+              </div>
             </div>
           )}
 
-          <div className={`${node.isContainer ? 'min-h-[50px]' : ''}`}>
+          <div className={`${node.isContainer ? "min-h-[50px]" : ""}`}>
             <ComponentToRender {...node.props}>
               {renderComponentTree(node.children)}
             </ComponentToRender>
@@ -1269,361 +1413,894 @@ ${scopeInit}
   };
 
   return (
-    <div className="flex h-screen bg-[#0a0a0b] text-white font-sans overflow-hidden">
-      {/* Sidebar - Component Library */}
-      <div className={`bg-white/5 backdrop-blur-xl border-r border-white/10 flex flex-col shadow-2xl z-20 transition-all duration-300 ease-in-out
-        ${isSidebarVisible ? 'w-72' : 'w-0 -translate-x-full opacity-0 overflow-hidden'}`}>
-        <div className="p-6 border-b border-white/10 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center shadow-lg shadow-blue-500/20">
-              <Box size={18} className="text-white" />
-            </div>
-            <h1 className="text-lg font-black tracking-tight bg-gradient-to-r from-white to-white/60 bg-clip-text text-transparent">BUILDER</h1>
-          </div>
-        </div>
-        
-        <div className="flex-1 overflow-y-auto custom-scrollbar p-4 space-y-8">
-          {[
-            { id: "layout", label: "Layout", icon: <Layout size={14} /> },
-            { id: "basic", label: "Typography", icon: <CompIcon size={14} /> },
-            { id: "components", label: "Components", icon: <Box size={14} /> }
-          ].map((cat) => (
-            <div key={cat.id} className="space-y-3">
-              <div className="flex items-center gap-2 px-2 text-[10px] uppercase font-black tracking-widest text-white/30">
-                {cat.icon}
-                <span>{cat.label}</span>
-              </div>
-              <div className="grid grid-cols-1 gap-2">
-                {Object.entries(componentTemplates)
-                  .filter(([_, t]) => t.category === cat.id)
-                  .map(([type, t]) => (
-                    <div
-                      key={type}
-                      draggable
-                      onDragStart={(e) => handleDragStart(e, type)}
-                      className="group flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/5 hover:border-blue-500/50 hover:bg-white/10 transition-all cursor-grab active:cursor-grabbing"
-                    >
-                      <span className="text-sm font-semibold text-white/70 group-hover:text-white">{t.name}</span>
-                      <ChevronRight size={14} className="text-white/20 group-hover:text-blue-500 transition-colors" />
-                    </div>
-                  ))}
+    <div>
+      <div>
+        <div className="flex h-screen bg-[#0a0a0b] text-white font-sans overflow-hidden">
+          {/* Sidebar - Component Library */}
+          <div
+            className={`bg-white/5 backdrop-blur-xl border-r border-white/10 flex flex-col shadow-2xl z-20 transition-all duration-300 ease-in-out fixed lg:relative inset-y-0 left-0 h-full
+          ${isSidebarVisible ? "w-72 translate-x-0" : "w-72 -translate-x-full opacity-0 lg:translate-x-0 lg:opacity-0 lg:w-0 lg:hidden"}`}
+          >
+            <div className="p-6 border-b border-white/10 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center shadow-lg shadow-blue-500/20">
+                  <Box size={18} className="text-white" />
+                </div>
+                <h1 className="text-lg font-black tracking-tight bg-gradient-to-r from-white to-white/60 bg-clip-text text-transparent">
+                  BUILDER
+                </h1>
               </div>
             </div>
-          ))}
-        </div>
-        
-        <div className="p-4 border-t border-white/10 bg-black/20">
-            <button
-              onClick={() => { if (confirm("Clear all?")) setComponents([]); }}
-              className="w-full flex items-center justify-center gap-2 p-3 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-400 text-xs font-bold transition-all border border-red-500/20"
-            >
-              <Trash2 size={14} />
-              Clear Canvas
-            </button>
-        </div>
-      </div>
 
-      {/* Main Content Area */}
-      <div className="flex-1 flex flex-col bg-[#0f0f11] relative overflow-hidden">
-        {/* Canvas Toolbar */}
-        <div className="h-16 px-6 border-b border-white/10 flex items-center justify-between bg-black/20 backdrop-blur-md z-10">
-          <div className="flex items-center gap-4">
-             <button 
-                onClick={() => setIsSidebarVisible(!isSidebarVisible)}
-                className={`p-2 rounded-lg transition-all ${isSidebarVisible ? 'bg-white/10 text-white' : 'bg-blue-600 text-white shadow-lg shadow-blue-500/20'}`}
-                title={isSidebarVisible ? "Hide Sidebar" : "Show Sidebar"}
-             >
-                <Layout size={16} />
-             </button>
-             <div className="flex items-center gap-2 text-xs font-bold text-white/40 tabular-nums">
-                <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
-                Canvas Active
-             </div>
+            <div className="flex-1 overflow-y-auto custom-scrollbar p-4 space-y-8">
+              {[
+                { id: "layout", label: "Layout", icon: <Layout size={14} /> },
+                {
+                  id: "basic",
+                  label: "Typography",
+                  icon: <CompIcon size={14} />,
+                },
+                {
+                  id: "components",
+                  label: "Components",
+                  icon: <Box size={14} />,
+                },
+              ].map((cat) => (
+                <div key={cat.id} className="space-y-3">
+                  <div className="flex items-center gap-2 px-2 text-[10px] uppercase font-black tracking-widest text-white/30">
+                    {cat.icon}
+                    <span>{cat.label}</span>
+                  </div>
+                  <div className="grid grid-cols-1 gap-2">
+                    {Object.entries(componentTemplates)
+                      .filter(([_, t]) => t.category === cat.id)
+                      .map(([type, t]) => (
+                        <div
+                          key={type}
+                          draggable
+                          onDragStart={(e) => handleDragStart(e, type)}
+                          className="group flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/5 hover:border-blue-500/50 hover:bg-white/10 transition-all cursor-grab active:cursor-grabbing"
+                        >
+                          <span className="text-sm font-semibold text-white/70 group-hover:text-white">
+                            {t.name}
+                          </span>
+                          <ChevronRight
+                            size={14}
+                            className="text-white/20 group-hover:text-blue-500 transition-colors"
+                          />
+                        </div>
+                      ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="p-4 border-t border-white/10 bg-black/20">
+              <button
+                onClick={() => {
+                  if (confirm("Clear all?")) setComponents([]);
+                }}
+                className="w-full flex items-center justify-center gap-2 p-3 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-400 text-xs font-bold transition-all border border-red-500/20"
+              >
+                <Trash2 size={14} />
+                Clear Canvas
+              </button>
+            </div>
           </div>
-          <div className="flex items-center gap-3">
-            <div className="flex p-1 bg-white/5 rounded-lg border border-white/10">
-                <button 
-                    onClick={() => {
-                        setIsSidebarVisible(!isSidebarVisible);
-                        setIsRightPanelVisible(!isRightPanelVisible);
-                    }}
-                    className={`p-1.5 rounded-md transition-all ${(!isSidebarVisible && !isRightPanelVisible) ? 'bg-blue-600 text-white' : 'text-white/40 hover:text-white'}`}
+
+          {/* Main Content Area */}
+          <div className="flex-1 flex flex-col bg-[#0f0f11] relative overflow-hidden min-w-0">
+            {/* Canvas Toolbar */}
+            <div className="h-14 sm:h-16 px-4 sm:px-6 border-b border-white/10 flex items-center justify-between bg-black/20 backdrop-blur-md z-10">
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={() => setIsSidebarVisible(!isSidebarVisible)}
+                  className={`p-2 rounded-lg transition-all ${
+                    isSidebarVisible
+                      ? "bg-white/10 text-white"
+                      : "bg-blue-600 text-white shadow-lg shadow-blue-500/20"
+                  }`}
+                  title={isSidebarVisible ? "Hide Sidebar" : "Show Sidebar"}
                 >
-                    <Maximize2 size={14} />
+                  <Layout size={16} />
                 </button>
-                <button 
+                <div className="hidden sm:flex items-center gap-2 text-xs font-bold text-white/40 tabular-nums">
+                  <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+                  Canvas Active
+                </div>
+              </div>
+              <div className="flex items-center gap-3">
+                <div className="flex p-1 bg-white/5 rounded-lg border border-white/10">
+                  <button
+                    onClick={() => {
+                      setIsSidebarVisible(!isSidebarVisible);
+                      setIsRightPanelVisible(!isRightPanelVisible);
+                    }}
+                    className={`p-1.5 rounded-md transition-all ${
+                      !isSidebarVisible && !isRightPanelVisible
+                        ? "bg-blue-600 text-white"
+                        : "text-white/40 hover:text-white"
+                    }`}
+                  >
+                    <Maximize2 size={14} />
+                  </button>
+                  <button
                     onClick={() => setIsRightPanelVisible(!isRightPanelVisible)}
                     className="p-1.5 rounded-md text-white/40 hover:text-white transition-colors"
-                >
+                  >
                     <Settings size={14} />
-                </button>
-            </div>
-          </div>
-        </div>
-
-        {/* Canvas Container */}
-        <div className="flex-1 overflow-auto p-4 md:p-8 flex justify-center custom-scrollbar bg-[#0f0f11]">
-          <div
-            className={`w-full max-w-6xl min-h-full bg-white rounded-[1.5rem] shadow-2xl shadow-black/50 transform transition-all duration-300 origin-top mb-12
-              ${dragOverId === null && dragPosition === "inside" ? 'ring-4 ring-blue-500/50 scale-[1.01]' : 'ring-1 ring-white/10'}`}
-            onDragOver={(e) => handleDragOver(e, null)}
-            onDrop={(e) => handleDrop(e, null)}
-            onClick={() => setSelectedId(null)}
-          >
-            {components.length === 0 ? (
-              <div className="h-full min-h-[700px] flex flex-col items-center justify-center gap-4 text-gray-300">
-                <div className="w-20 h-20 rounded-3xl bg-gray-50 flex items-center justify-center border-2 border-dashed border-gray-200">
-                    <CompIcon className="text-gray-300" size={32} />
-                </div>
-                <div className="text-center">
-                    <p className="text-lg font-bold text-gray-900">Start Building</p>
-                    <p className="text-sm text-gray-500">Drag components from the sidebar to the canvas</p>
+                  </button>
                 </div>
               </div>
-            ) : (
-              <div className="h-full bg-white text-black p-4 md:p-8 rounded-[1.5rem]">
-                {renderComponentTree(components)}
+            </div>
+
+            {/* Canvas Container */}
+            <div className="flex-1 overflow-auto p-4 md:p-8 flex justify-center custom-scrollbar bg-[#0f0f11]">
+              <div
+                className={`w-full max-w-6xl min-h-full bg-white rounded-[1.5rem] shadow-2xl shadow-black/50 transform transition-all duration-300 origin-top mb-12
+              ${
+                dragOverId === null && dragPosition === "inside"
+                  ? "ring-4 ring-blue-500/50 scale-[1.01]"
+                  : "ring-1 ring-white/10"
+              }`}
+                onDragOver={(e) => handleDragOver(e, null)}
+                onDrop={(e) => handleDrop(e, null)}
+                onClick={() => setSelectedId(null)}
+              >
+                {components.length === 0 ? (
+                  <div className="h-full min-h-[700px] flex flex-col items-center justify-center gap-4 text-gray-300">
+                    <div className="w-20 h-20 rounded-3xl bg-gray-50 flex items-center justify-center border-2 border-dashed border-gray-200">
+                      <CompIcon className="text-gray-300" size={32} />
+                    </div>
+                    <div className="text-center">
+                      <p className="text-lg font-bold text-gray-900">
+                        Start Building
+                      </p>
+                      <p className="text-sm text-gray-500">
+                        Drag components from the sidebar to the canvas
+                      </p>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="h-full bg-white text-black p-4 md:p-8 rounded-[1.5rem]">
+                    {renderComponentTree(components)}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Right Panel - Properties & Code */}
+          <div
+            className={`bg-white/5 backdrop-blur-xl border-l border-white/10 flex flex-col shadow-2xl z-20 transition-all duration-300 ease-in-out fixed lg:relative inset-y-0 right-0 h-full w-full sm:w-80
+          ${isRightPanelVisible ? "translate-x-0" : "translate-x-full sm:translate-x-full sm:w-0 sm:opacity-0 sm:pointer-events-none"}`}
+          >
+            <div className="flex border-b border-white/10">
+              <button
+                onClick={() => setRightPanelTab("properties")}
+                className={`flex-1 p-3 sm:p-4 text-[10px] font-black tracking-widest uppercase transition-all
+              ${
+                rightPanelTab === "properties"
+                  ? "text-blue-500 border-b-2 border-blue-500 bg-blue-500/5"
+                  : "text-white/40 hover:text-white"
+              }`}
+              >
+                Properties
+              </button>
+              <button
+                onClick={() => setRightPanelTab("history")}
+                className={`flex-1 p-3 sm:p-4 text-[10px] font-black tracking-widest uppercase transition-all
+              ${
+                rightPanelTab === "history"
+                  ? "text-blue-500 border-b-2 border-blue-500 bg-blue-500/5"
+                  : "text-white/40 hover:text-white"
+              }`}
+              >
+                History
+              </button>
+              <button
+                onClick={() => setRightPanelTab("deploy")}
+                className={`flex-1 p-3 sm:p-4 text-[10px] font-black tracking-widest uppercase transition-all
+              ${
+                rightPanelTab === "deploy"
+                  ? "text-orange-400 border-b-2 border-orange-400 bg-orange-500/5"
+                  : "text-white/40 hover:text-white"
+              }`}
+              >
+                Deploy
+              </button>
+            </div>
+
+            <div className="flex-1 overflow-y-auto custom-scrollbar">
+              {rightPanelTab === "properties" ? (
+                /* Properties Section */
+                <div className="p-4 sm:p-6 space-y-6">
+                  {editingId ? (
+                    (() => {
+                      const comp = findComponent(components, editingId);
+                      const tmpl = comp ? componentTemplates[comp.type] : null;
+                      if (!comp || !tmpl) return null;
+
+                      return (
+                        <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-300">
+                          <div className="flex items-center justify-between">
+                            <h3 className="text-sm font-bold text-white uppercase tracking-tight">
+                              Edit {tmpl.name}
+                            </h3>
+                            <button
+                              onClick={() => setEditingId(null)}
+                              className="p-1 hover:bg-white/10 rounded-md transition-colors"
+                            >
+                              <Trash2 size={14} className="text-white/40" />
+                            </button>
+                          </div>
+
+                          <div className="space-y-4">
+                            {tmpl.editableFields.map((field) => (
+                              <div key={field.name} className="space-y-1.5">
+                                <label className="text-[10px] font-bold text-white/40 uppercase tracking-widest">
+                                  {field.label}
+                                </label>
+                                {field.type === "textarea" ? (
+                                  <textarea
+                                    value={editProps[field.name] || ""}
+                                    onChange={(e) =>
+                                      setEditProps({
+                                        ...editProps,
+                                        [field.name]: e.target.value,
+                                      })
+                                    }
+                                    className="w-full bg-white/5 border border-white/10 rounded-lg p-3 text-sm text-white focus:outline-none focus:border-blue-500/50 transition-all"
+                                    rows={3}
+                                  />
+                                ) : field.type === "select" ? (
+                                  <select
+                                    value={editProps[field.name] || ""}
+                                    onChange={(e) =>
+                                      setEditProps({
+                                        ...editProps,
+                                        [field.name]: e.target.value,
+                                      })
+                                    }
+                                    className="w-full bg-white/5 border border-white/10 rounded-lg p-3 text-sm text-white focus:outline-none focus:border-blue-500/50 transition-all appearance-none"
+                                  >
+                                    {field.options?.map((opt) => (
+                                      <option
+                                        key={opt}
+                                        value={opt}
+                                        className="bg-[#1a1a1a]"
+                                      >
+                                        {opt}
+                                      </option>
+                                    ))}
+                                  </select>
+                                ) : (
+                                  <div className="relative group">
+                                    <input
+                                      type={field.type}
+                                      value={editProps[field.name] || ""}
+                                      onChange={(e) =>
+                                        setEditProps({
+                                          ...editProps,
+                                          [field.name]: e.target.value,
+                                        })
+                                      }
+                                      className={`w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2.5 text-sm text-white focus:outline-none focus:border-blue-500/50 transition-all
+                                    ${field.type === "color" ? "h-10 p-1" : ""}`}
+                                    />
+                                    {field.type === "color" && (
+                                      <div className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-mono text-white/40 pointer-events-none group-focus-within:hidden">
+                                        {editProps[field.name]}
+                                      </div>
+                                    )}
+                                  </div>
+                                )}
+                              </div>
+                            ))}
+
+                            {/* Navbar Links */}
+                            {comp.type === "navbar" && (
+                              <div className="pt-4 mt-4 border-t border-white/10 space-y-4">
+                                <label className="text-[10px] font-bold text-white/40 uppercase tracking-widest">
+                                  Navigation Links
+                                </label>
+                                <div className="space-y-2">
+                                  {editProps.navLinks?.map((link: NavLink) => (
+                                    <div
+                                      key={link.id}
+                                      className="group p-3 rounded-xl bg-white/5 border border-white/5 flex items-center justify-between animate-in zoom-in-95 duration-200"
+                                    >
+                                      <div className="space-y-0.5">
+                                        <div className="text-xs font-bold text-white">
+                                          {link.label}
+                                        </div>
+                                        <div className="text-[10px] text-white/40 font-mono truncate max-w-28">
+                                          {link.href}
+                                        </div>
+                                      </div>
+                                      <button
+                                        onClick={() =>
+                                          setEditProps({
+                                            ...editProps,
+                                            navLinks: editProps.navLinks.filter(
+                                              (l: NavLink) => l.id !== link.id,
+                                            ),
+                                          })
+                                        }
+                                        className="p-1.5 opacity-0 group-hover:opacity-100 bg-red-500/20 text-red-500 rounded-md transition-all"
+                                      >
+                                        <Trash2 size={12} />
+                                      </button>
+                                    </div>
+                                  ))}
+                                </div>
+                                <div className="space-y-2 p-3 rounded-xl bg-black/20 border border-white/5">
+                                  <input
+                                    placeholder="Link label"
+                                    value={newNavLink.label}
+                                    onChange={(e) =>
+                                      setNewNavLink({
+                                        ...newNavLink,
+                                        label: e.target.value,
+                                      })
+                                    }
+                                    className="w-full bg-transparent text-xs text-white focus:outline-none placeholder:text-white/20"
+                                  />
+                                  <input
+                                    placeholder="URL path"
+                                    value={newNavLink.href}
+                                    onChange={(e) =>
+                                      setNewNavLink({
+                                        ...newNavLink,
+                                        href: e.target.value,
+                                      })
+                                    }
+                                    className="w-full bg-transparent text-[10px] font-mono text-white/40 focus:outline-none placeholder:text-white/10"
+                                  />
+                                  <button
+                                    onClick={() => {
+                                      if (newNavLink.label && newNavLink.href) {
+                                        const updatedLinks = [
+                                          ...(editProps.navLinks || []),
+                                        ];
+                                        updatedLinks.push({
+                                          id: generateId(),
+                                          ...newNavLink,
+                                        });
+                                        setEditProps({
+                                          ...editProps,
+                                          navLinks: updatedLinks,
+                                        });
+                                        setNewNavLink({ label: "", href: "" });
+                                      }
+                                    }}
+                                    className="w-full py-2 bg-blue-600 rounded-lg text-[10px] font-black uppercase tracking-widest hover:bg-blue-500 transition-colors shadow-lg shadow-blue-500/20"
+                                  >
+                                    Add Link
+                                  </button>
+                                </div>
+                              </div>
+                            )}
+
+                            <button
+                              onClick={saveEdit}
+                              className="w-full py-4 bg-white text-black rounded-xl text-xs font-black uppercase tracking-widest hover:bg-white/90 transition-all shadow-xl shadow-white/5 mt-8 flex items-center justify-center gap-2"
+                            >
+                              <Check size={14} />
+                              Save Changes
+                            </button>
+                          </div>
+                        </div>
+                      );
+                    })()
+                  ) : (
+                    <div className="h-40 flex flex-col items-center justify-center text-center p-6 border-2 border-dashed border-white/5 rounded-2xl">
+                      <Settings size={24} className="text-white/10 mb-2" />
+                      <p className="text-[10px] font-bold text-white/30 uppercase tracking-widest leading-relaxed">
+                        Select an element on the canvas to edit its properties
+                      </p>
+                    </div>
+                  )}
+                </div>
+              ) : rightPanelTab === "history" ? (
+                /* History Section */
+                <div className="p-4 sm:p-6 space-y-4">
+                  <div className="flex items-center gap-2 text-white/60 mb-6">
+                    <RefreshCcw size={14} />
+                    <h3 className="text-xs font-bold uppercase tracking-widest">
+                      Action History
+                    </h3>
+                  </div>
+                  <div className="space-y-3">
+                    {history.length === 0 ? (
+                      <div className="py-12 text-center space-y-2">
+                        <RefreshCcw
+                          size={20}
+                          className="text-white/10 mx-auto"
+                        />
+                        <p className="text-[10px] text-white/20 uppercase font-bold tracking-widest">
+                          No activities yet
+                        </p>
+                      </div>
+                    ) : (
+                      history.map((item) => (
+                        <div
+                          key={item.id}
+                          className="p-3 rounded-lg bg-white/5 border border-white/5 flex items-center justify-between text-[10px] animate-in slide-in-from-top-2 duration-300"
+                        >
+                          <span className="text-white/40 font-mono">
+                            {item.time}
+                          </span>
+                          <span className="flex items-center gap-2">
+                            <span className="text-white/60">{item.action}</span>
+                            <span className="text-blue-400 font-bold uppercase">
+                              {item.type}
+                            </span>
+                          </span>
+                        </div>
+                      ))
+                    )}
+                    {history.length > 0 && (
+                      <p className="text-center text-[10px] text-white/20 pt-4 italic">
+                        Showing last {history.length} actions
+                      </p>
+                    )}
+                  </div>
+                </div>
+              ) : (
+                /* Deploy Section */
+                <div className="p-4 sm:p-6 space-y-4">
+                  <div className="flex items-center gap-2 text-white/60 mb-2">
+                    <Globe size={14} className="text-orange-400" />
+                    <h3 className="text-xs font-bold uppercase tracking-widest">
+                      Deploy Center
+                    </h3>
+                  </div>
+
+                  {/* Download ZIP */}
+                  <div className="relative group border border-white/10 rounded-2xl p-4 bg-white/5 hover:bg-white/10 transition-all">
+                    <div className="flex items-start gap-3">
+                      <div className="w-10 h-10 rounded-xl bg-green-500/20 flex items-center justify-center shrink-0">
+                        <Download size={18} className="text-green-400" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <h3 className="text-white font-black text-sm mb-0.5">
+                          Download as ZIP
+                        </h3>
+                        <p className="text-white/30 text-[10px] mb-3 leading-relaxed">
+                          Self-host on GitHub Pages, Vercel, Cloudflare, etc.
+                        </p>
+                        <button
+                          onClick={async () => {
+                            if (components.length === 0) {
+                              setDeployModal({
+                                open: true,
+                                url: null,
+                                method: "Download ZIP",
+                                error:
+                                  "Add some components to your canvas first!",
+                              });
+                              return;
+                            }
+                            setDeployLoading(true);
+                            try {
+                              await downloadAsZip(generateHTMLCode());
+                              setDeployModal({
+                                open: true,
+                                url: null,
+                                method: "Download ZIP",
+                                error: null,
+                              });
+                            } catch (e: any) {
+                              setDeployModal({
+                                open: true,
+                                url: null,
+                                method: "Download ZIP",
+                                error: e.message,
+                              });
+                            } finally {
+                              setDeployLoading(false);
+                            }
+                          }}
+                          disabled={deployLoading}
+                          className="w-full py-2.5 rounded-xl bg-green-500/20 text-green-300 text-[11px] font-bold border border-green-500/30 hover:bg-green-500/30 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+                        >
+                          {deployLoading ? (
+                            <RefreshCcw size={13} className="animate-spin" />
+                          ) : (
+                            <Download size={13} />
+                          )}
+                          {deployLoading ? "Preparing..." : "Download ZIP"}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Netlify Deploy */}
+                  <div className="relative group border border-orange-500/20 rounded-2xl p-4 bg-gradient-to-br from-orange-500/5 to-amber-500/5 hover:from-orange-500/10 hover:to-amber-500/10 transition-all">
+                    <div className="flex items-start gap-3">
+                      <div className="w-10 h-10 rounded-xl bg-orange-500/20 flex items-center justify-center shrink-0">
+                        <Globe size={18} className="text-orange-400" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-0.5">
+                          <h3 className="text-white font-black text-sm">
+                            Deploy to Netlify
+                          </h3>
+                          <span className="text-[9px] font-bold text-orange-400 bg-orange-500/10 border border-orange-500/20 px-1.5 py-0.5 rounded-full uppercase tracking-widest">
+                            Recommended
+                          </span>
+                        </div>
+                        <p className="text-white/30 text-[10px] mb-3 leading-relaxed">
+                          Get a free permanent URL with one click
+                        </p>
+
+                        {/* Token Status */}
+                        <div className="flex items-center gap-2 mb-3 p-2.5 rounded-xl bg-black/20 border border-white/5">
+                          {netlifyToken ? (
+                            <>
+                              <div className="w-5 h-5 rounded-full bg-green-500/20 flex items-center justify-center">
+                                <Check size={10} className="text-green-400" />
+                              </div>
+                              <span className="text-[10px] text-green-400 font-bold">
+                                Token configured
+                              </span>
+                              <button
+                                onClick={() => {
+                                  localStorage.removeItem("netlify_token");
+                                  setNetlifyToken("");
+                                  setTokenInput("");
+                                }}
+                                className="ml-auto text-[9px] text-white/30 hover:text-red-400 transition-colors"
+                              >
+                                Remove
+                              </button>
+                            </>
+                          ) : (
+                            <>
+                              <div className="w-5 h-5 rounded-full bg-white/10 flex items-center justify-center">
+                                <X size={10} className="text-white/30" />
+                              </div>
+                              <span className="text-[10px] text-white/40">
+                                No token
+                              </span>
+                            </>
+                          )}
+                        </div>
+
+                        {!netlifyToken && (
+                          <div className="mb-3">
+                            <input
+                              type="password"
+                              value={tokenInput}
+                              onChange={(e) => setTokenInput(e.target.value)}
+                              placeholder="Paste Netlify personal access token..."
+                              className="w-full bg-black/30 border border-white/10 rounded-xl px-3 py-2 text-[11px] text-white placeholder:text-white/20 outline-none focus:border-orange-500/40 transition-all"
+                            />
+                            <p className="text-[9px] text-white/20 mt-1.5 leading-relaxed">
+                              app.netlify.com → User Settings → Applications →
+                              OAuth
+                            </p>
+                          </div>
+                        )}
+
+                        <div className="mb-3">
+                          <input
+                            type="text"
+                            value={netlifySiteId}
+                            onChange={(e) => setNetlifySiteId(e.target.value)}
+                            placeholder="Optional Netlify Site ID (reuse existing deploy target)"
+                            className="w-full bg-black/30 border border-white/10 rounded-xl px-3 py-2 text-[11px] text-white placeholder:text-white/20 outline-none focus:border-orange-500/40 transition-all"
+                          />
+                          <p className="text-[9px] text-white/20 mt-1.5 leading-relaxed">
+                            Leave empty to create a new site automatically
+                            (requires token scope sites:write).
+                          </p>
+                        </div>
+
+                        <button
+                          onClick={async () => {
+                            const token = netlifyToken || tokenInput.trim();
+                            if (!token) {
+                              setDeployModal({
+                                open: true,
+                                url: null,
+                                method: "Netlify",
+                                error:
+                                  "Please paste your Netlify token above first.",
+                              });
+                              return;
+                            }
+                            if (components.length === 0) {
+                              setDeployModal({
+                                open: true,
+                                url: null,
+                                method: "Netlify",
+                                error:
+                                  "Add some components to your canvas first!",
+                              });
+                              return;
+                            }
+                            if (!netlifyToken && tokenInput.trim()) {
+                              localStorage.setItem(
+                                "netlify_token",
+                                tokenInput.trim(),
+                              );
+                              setNetlifyToken(tokenInput.trim());
+                            }
+                            setDeployLoading(true);
+                            try {
+                              const url = await deployToNetlifyAuth(
+                                generateHTMLCode(),
+                                token,
+                                netlifySiteId || undefined,
+                              );
+                              setDeployModal({
+                                open: true,
+                                url,
+                                method: "Netlify",
+                                error: null,
+                              });
+                            } catch (e: any) {
+                              setDeployModal({
+                                open: true,
+                                url: null,
+                                method: "Netlify",
+                                error: e.message,
+                              });
+                            } finally {
+                              setDeployLoading(false);
+                            }
+                          }}
+                          disabled={deployLoading}
+                          className="w-full py-2.5 rounded-xl bg-orange-500/20 text-orange-300 text-[11px] font-bold border border-orange-500/30 hover:bg-orange-500/30 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+                        >
+                          {deployLoading ? (
+                            <RefreshCcw size={13} className="animate-spin" />
+                          ) : (
+                            <Upload size={13} />
+                          )}
+                          {deployLoading ? "Deploying..." : "Deploy to Netlify"}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Netlify Drop Tip */}
+                  <div className="flex items-start gap-2.5 p-3 rounded-xl bg-blue-500/5 border border-blue-500/10">
+                    <Globe
+                      size={13}
+                      className="text-blue-400 shrink-0 mt-0.5"
+                    />
+                    <p className="text-white/50 text-[10px] leading-relaxed">
+                      <span className="text-blue-400 font-bold">
+                        No account?
+                      </span>{" "}
+                      Download the ZIP, then drag it to{" "}
+                      <span className="text-blue-300 font-mono">
+                        app.netlify.com/drop
+                      </span>{" "}
+                      for a free instant URL.
+                    </p>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Code Preview Bottom Sheet */}
+            <div className="flex-1 min-h-0 border-t border-white/10 bg-black/40 flex flex-col">
+              {/* Header + Tabs */}
+              <div className="flex flex-col">
+                <div className="px-4 sm:px-6 py-3 border-b border-white/10 flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <CompIcon size={14} className="text-blue-500" />
+                    <span className="text-[10px] font-black uppercase tracking-widest">
+                      Output
+                    </span>
+                  </div>
+                  <button
+                    onClick={handleCopyCode}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-500/10 text-blue-400 text-[10px] font-bold border border-blue-500/20 hover:bg-blue-500/20 transition-all"
+                  >
+                    {copyStatus ? <Check size={11} /> : <Copy size={11} />}
+                    {copyStatus ? "Copied" : "Copy"}
+                  </button>
+                </div>
+
+                {/* Tab Row */}
+                <div className="px-2 sm:px-4 pt-2 flex gap-1 overflow-x-auto">
+                  {(["react", "html", "angularjs"] as const).map((tab) => (
+                    <button
+                      key={tab}
+                      onClick={() => setSelectedTab(tab)}
+                      className={`px-3 sm:px-4 py-2 rounded-t-lg text-[10px] font-black uppercase tracking-widest transition-all border-b-2 whitespace-nowrap
+                    ${
+                      selectedTab === tab
+                        ? "bg-white/10 text-white border-white/30"
+                        : "text-white/30 hover:text-white/60 border-transparent"
+                    }`}
+                    >
+                      {tab === "react"
+                        ? "React"
+                        : tab === "html"
+                          ? "HTML"
+                          : "Angular"}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Code View */}
+              <div className="flex-1 min-h-0 overflow-hidden relative">
+                <div className="absolute p-2 overflow-auto inset-0  custom-scrollbar">
+                  <CodeBlock
+                    code={getActiveCode()}
+                    language={
+                      selectedTab === "react"
+                        ? "jsx"
+                        : selectedTab === "html"
+                          ? "html"
+                          : "angular"
+                    }
+                    className="rounded-none  border-none text-[11px] min-h-full "
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Deploy Result Modal */}
+            {deployModal.open && (
+              <div className="absolute inset-0 bg-black/70 z-50 flex items-center justify-center p-8 backdrop-blur-sm">
+                <div className="bg-black/95 border border-white/10 rounded-2xl p-8 w-full max-w-md text-center shadow-2xl">
+                  {deployModal.error ? (
+                    <>
+                      <div className="w-14 h-14 rounded-full bg-red-500/20 flex items-center justify-center mx-auto mb-4">
+                        <X size={22} className="text-red-400" />
+                      </div>
+                      <h3 className="text-white font-black text-base mb-2">
+                        Deployment Failed
+                      </h3>
+                      <p className="text-white/50 text-[11px] mb-6 leading-relaxed">
+                        {deployModal.error}
+                      </p>
+                      <button
+                        onClick={() =>
+                          setDeployModal({
+                            open: false,
+                            url: null,
+                            method: "",
+                            error: null,
+                          })
+                        }
+                        className="px-8 py-2.5 rounded-xl bg-white/10 text-white text-[11px] font-bold hover:bg-white/20 transition-all"
+                      >
+                        Close
+                      </button>
+                    </>
+                  ) : deployModal.url ? (
+                    <>
+                      <div className="w-14 h-14 rounded-full bg-green-500/20 flex items-center justify-center mx-auto mb-4">
+                        <Check size={22} className="text-green-400" />
+                      </div>
+                      <h3 className="text-white font-black text-base mb-1">
+                        Deployed Successfully!
+                      </h3>
+                      <p className="text-white/40 text-[10px] mb-5">
+                        Your site is live — share this URL anywhere
+                      </p>
+                      <a
+                        href={deployModal.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-green-500/15 text-green-400 text-[11px] font-bold border border-green-500/30 hover:bg-green-500/25 transition-all mb-5 break-all max-w-full"
+                      >
+                        <ExternalLink size={13} />
+                        <span className="truncate">{deployModal.url}</span>
+                      </a>
+                      <div className="flex gap-2 justify-center">
+                        <button
+                          onClick={() =>
+                            navigator.clipboard.writeText(deployModal.url!)
+                          }
+                          className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-white/5 text-white/60 text-[10px] font-bold hover:bg-white/10 transition-all"
+                        >
+                          <Copy size={10} /> Copy URL
+                        </button>
+                        <button
+                          onClick={() =>
+                            setDeployModal({
+                              open: false,
+                              url: null,
+                              method: "",
+                              error: null,
+                            })
+                          }
+                          className="px-5 py-2 rounded-xl bg-white/10 text-white text-[10px] font-bold hover:bg-white/20 transition-all"
+                        >
+                          Done
+                        </button>
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <div className="w-14 h-14 rounded-full bg-green-500/20 flex items-center justify-center mx-auto mb-4">
+                        <Check size={22} className="text-green-400" />
+                      </div>
+                      <h3 className="text-white font-black text-base mb-1">
+                        Download Started!
+                      </h3>
+                      <p className="text-white/40 text-[10px] mb-5">
+                        Your website has been packaged as a ZIP file
+                      </p>
+                      <button
+                        onClick={() =>
+                          setDeployModal({
+                            open: false,
+                            url: null,
+                            method: "",
+                            error: null,
+                          })
+                        }
+                        className="px-8 py-2.5 rounded-xl bg-white/10 text-white text-[11px] font-bold hover:bg-white/20 transition-all"
+                      >
+                        Done
+                      </button>
+                    </>
+                  )}
+                </div>
               </div>
             )}
           </div>
         </div>
+
+        <style jsx global>{`
+          .custom-scrollbar::-webkit-scrollbar {
+            width: 3px;
+            height: 3px;
+          }
+          .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+          }
+          .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+          }
+          .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.2);
+          }
+
+          .component-wrapper {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+          }
+          .component-wrapper:hover {
+            box-shadow: 0 0 0 2px #3b82f6;
+          }
+          .component-wrapper.selected {
+            box-shadow: 0 0 0 2px #3b82f6;
+            z-index: 10;
+          }
+          .component-wrapper.drag-over {
+            background-color: rgba(59, 130, 246, 0.05);
+            outline: 2px dashed #3b82f6;
+            outline-offset: -2px;
+          }
+
+          .controls-overlay {
+            pointer-events: none;
+          }
+          .controls-actions {
+            pointer-events: auto;
+          }
+
+          .canvas-root {
+            min-height: 100%;
+            transition: all 0.3s ease;
+          }
+
+          ${getSubStyles(components).join("\n")}
+        `}</style>
       </div>
-
-      {/* Right Panel - Properties & Code */}
-      <div className={`bg-white/5 backdrop-blur-xl border-l border-white/10 flex flex-col shadow-2xl z-20 transition-all duration-300 ease-in-out
-        ${isRightPanelVisible ? 'w-80' : 'w-0 translate-x-full opacity-0 overflow-hidden'}`}>
-        <div className="flex border-b border-white/10">
-            <button 
-                onClick={() => setRightPanelTab("properties")}
-                className={`flex-1 p-4 text-[10px] font-black tracking-widest uppercase transition-all
-                  ${rightPanelTab === "properties" ? 'text-blue-500 border-b-2 border-blue-500 bg-blue-500/5' : 'text-white/40 hover:text-white'}`}
-            >
-                Properties
-            </button>
-            <button 
-                onClick={() => setRightPanelTab("history")}
-                className={`flex-1 p-4 text-[10px] font-black tracking-widest uppercase transition-all
-                  ${rightPanelTab === "history" ? 'text-blue-500 border-b-2 border-blue-500 bg-blue-500/5' : 'text-white/40 hover:text-white'}`}
-            >
-                History
-            </button>
-        </div>
-
-        <div className="flex-1 overflow-y-auto custom-scrollbar">
-          {rightPanelTab === "properties" ? (
-            /* Properties Section */
-            <div className="p-6 space-y-6">
-              {editingId ? (
-                (() => {
-                  const comp = findComponent(components, editingId);
-                  const tmpl = comp ? componentTemplates[comp.type] : null;
-                  if (!comp || !tmpl) return null;
-
-                  return (
-                    <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-300">
-                      <div className="flex items-center justify-between">
-                          <h3 className="text-sm font-bold text-white uppercase tracking-tight">Edit {tmpl.name}</h3>
-                          <button onClick={() => setEditingId(null)} className="p-1 hover:bg-white/10 rounded-md transition-colors"><Trash2 size={14} className="text-white/40" /></button>
-                      </div>
-                      
-                      <div className="space-y-4">
-                        {tmpl.editableFields.map((field) => (
-                          <div key={field.name} className="space-y-1.5">
-                            <label className="text-[10px] font-bold text-white/40 uppercase tracking-widest">{field.label}</label>
-                            {field.type === "textarea" ? (
-                              <textarea
-                                value={editProps[field.name] || ""}
-                                onChange={(e) => setEditProps({ ...editProps, [field.name]: e.target.value })}
-                                className="w-full bg-white/5 border border-white/10 rounded-lg p-3 text-sm text-white focus:outline-none focus:border-blue-500/50 transition-all"
-                                rows={3}
-                              />
-                            ) : field.type === "select" ? (
-                              <select
-                                value={editProps[field.name] || ""}
-                                onChange={(e) => setEditProps({ ...editProps, [field.name]: e.target.value })}
-                                className="w-full bg-white/5 border border-white/10 rounded-lg p-3 text-sm text-white focus:outline-none focus:border-blue-500/50 transition-all appearance-none"
-                              >
-                                {field.options?.map((opt) => (
-                                  <option key={opt} value={opt} className="bg-[#1a1a1a]">{opt}</option>
-                                ))}
-                              </select>
-                            ) : (
-                              <div className="relative group">
-                                  <input
-                                  type={field.type}
-                                  value={editProps[field.name] || ""}
-                                  onChange={(e) => setEditProps({ ...editProps, [field.name]: e.target.value })}
-                                  className={`w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2.5 text-sm text-white focus:outline-none focus:border-blue-500/50 transition-all
-                                      ${field.type === 'color' ? 'h-10 p-1' : ''}`}
-                                  />
-                                  {field.type === 'color' && (
-                                      <div className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-mono text-white/40 pointer-events-none group-focus-within:hidden">
-                                          {editProps[field.name]}
-                                      </div>
-                                  )}
-                              </div>
-                            )}
-                          </div>
-                        ))}
-
-                        {/* Navbar Links Context Menu */}
-                        {comp.type === "navbar" && (
-                          <div className="pt-4 mt-4 border-t border-white/10 space-y-4">
-                            <label className="text-[10px] font-bold text-white/40 uppercase tracking-widest">Navigation Links</label>
-                            <div className="space-y-2">
-                              {editProps.navLinks?.map((link: NavLink) => (
-                                <div key={link.id} className="group p-3 rounded-xl bg-white/5 border border-white/5 flex items-center justify-between animate-in zoom-in-95 duration-200">
-                                  <div className="space-y-0.5">
-                                      <div className="text-xs font-bold text-white">{link.label}</div>
-                                      <div className="text-[10px] text-white/40 font-mono truncate max-w-[120px]">{link.href}</div>
-                                  </div>
-                                  <button onClick={() => setEditProps({ ...editProps, navLinks: editProps.navLinks.filter((l: NavLink) => l.id !== link.id) })} className="p-1.5 opacity-0 group-hover:opacity-100 bg-red-500/20 text-red-500 rounded-md transition-all">
-                                      <Trash2 size={12} />
-                                  </button>
-                                </div>
-                              ))}
-                            </div>
-                            <div className="space-y-2 p-3 rounded-xl bg-black/20 border border-white/5">
-                              <input
-                                  placeholder="Link label"
-                                  value={newNavLink.label}
-                                  onChange={(e) => setNewNavLink({ ...newNavLink, label: e.target.value })}
-                                  className="w-full bg-transparent text-xs text-white focus:outline-none placeholder:text-white/20"
-                              />
-                              <input
-                                  placeholder="URL path"
-                                  value={newNavLink.href}
-                                  onChange={(e) => setNewNavLink({ ...newNavLink, href: e.target.value })}
-                                  className="w-full bg-transparent text-[10px] font-mono text-white/40 focus:outline-none placeholder:text-white/10"
-                              />
-                              <button
-                                  onClick={() => {
-                                      if (newNavLink.label && newNavLink.href) {
-                                          const updatedLinks = [...(editProps.navLinks || [])];
-                                          updatedLinks.push({ id: generateId(), ...newNavLink });
-                                          setEditProps({ ...editProps, navLinks: updatedLinks });
-                                          setNewNavLink({ label: "", href: "" });
-                                      }
-                                  }}
-                                  className="w-full py-2 bg-blue-600 rounded-lg text-[10px] font-black uppercase tracking-widest hover:bg-blue-500 transition-colors shadow-lg shadow-blue-500/20"
-                              >
-                                  Add Link
-                              </button>
-                            </div>
-                          </div>
-                        )}
-
-                        <button 
-                          onClick={saveEdit} 
-                          className="w-full py-4 bg-white text-black rounded-xl text-xs font-black uppercase tracking-widest hover:bg-white/90 transition-all shadow-xl shadow-white/5 mt-8 flex items-center justify-center gap-2"
-                        >
-                           <Check size={14} />
-                           Save Changes
-                        </button>
-                      </div>
-                    </div>
-                  );
-                })()
-              ) : (
-                <div className="h-40 flex flex-col items-center justify-center text-center p-6 border-2 border-dashed border-white/5 rounded-2xl">
-                  <Settings size={24} className="text-white/10 mb-2" />
-                  <p className="text-[10px] font-bold text-white/30 uppercase tracking-widest leading-relaxed">Select an element on the canvas to edit its properties</p>
-                </div>
-              )}
-            </div>
-          ) : (
-            /* History Section */
-            <div className="p-6 space-y-4">
-               <div className="flex items-center gap-2 text-white/60 mb-6">
-                  <RefreshCcw size={14} />
-                  <h3 className="text-xs font-bold uppercase tracking-widest">Action History</h3>
-               </div>
-               <div className="space-y-3">
-                  {history.length === 0 ? (
-                    <div className="py-12 text-center space-y-2">
-                        <RefreshCcw size={20} className="text-white/10 mx-auto" />
-                        <p className="text-[10px] text-white/20 uppercase font-bold tracking-widest">No activities yet</p>
-                    </div>
-                  ) : (
-                    history.map(item => (
-                      <div key={item.id} className="p-3 rounded-lg bg-white/5 border border-white/5 flex items-center justify-between text-[10px] animate-in slide-in-from-top-2 duration-300">
-                          <span className="text-white/40 font-mono">{item.time}</span>
-                          <span className="flex items-center gap-2">
-                              <span className="text-white/60">{item.action}</span>
-                              <span className="text-blue-400 font-bold uppercase">{item.type}</span>
-                          </span>
-                      </div>
-                    ))
-                  )}
-                  {history.length > 0 && (
-                    <p className="text-center text-[10px] text-white/20 pt-4 italic">Showing last {history.length} actions</p>
-                  )}
-               </div>
-            </div>
-          )}
-        </div>
-
-        {/* Code Preview Bottom Sheet */}
-        <div className="h-1/2 border-t border-white/10 bg-black/40 flex flex-col">
-            <div className="px-6 py-4 border-b border-white/10 flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                    <CompIcon size={14} className="text-blue-500" />
-                    <span className="text-[10px] font-black uppercase tracking-widest">Generated Output</span>
-                </div>
-                <button
-                    onClick={handleCopyCode}
-                    className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-blue-500/10 text-blue-400 text-[10px] font-bold border border-blue-500/20 hover:bg-blue-500/20 transition-all"
-                >
-                    {copyStatus ? <Check size={12} /> : <Copy size={12} />}
-                    {copyStatus ? "Copied" : "Copy"}
-                </button>
-            </div>
-            
-            <div className="p-2 flex gap-1 border-b border-white/5 bg-black/20">
-                {(["react", "html", "angularjs"] as const).map((lang) => (
-                    <button
-                        key={lang}
-                        onClick={() => setSelectedLang(lang)}
-                        className={`flex-1 py-2 rounded-md text-[9px] font-black uppercase tracking-widest transition-all
-                            ${selectedLang === lang ? 'bg-white/10 text-white shadow-sm' : 'text-white/30 hover:text-white/60'}`}
-                    >
-                        {lang === "react" ? "React" : lang === "html" ? "HTML" : "Angular"}
-                    </button>
-                ))}
-            </div>
-
-            <div className="flex-1 overflow-hidden relative">
-                <div className="absolute inset-0 overflow-auto custom-scrollbar p-0">
-                    <CodeBlock 
-                        code={getActiveCode()} 
-                        language={selectedLang === "react" ? "jsx" : selectedLang === "html" ? "html" : "angular"} 
-                        className="rounded-none border-none text-[11px]"
-                    />
-                </div>
-            </div>
-        </div>
-      </div>
-
-      <style jsx global>{`
-        .custom-scrollbar::-webkit-scrollbar { width: 5px; height: 5px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
-        
-        .component-wrapper { transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); cursor: pointer; }
-        .component-wrapper:hover { box-shadow: 0 0 0 2px #3b82f6; }
-        .component-wrapper.selected { box-shadow: 0 0 0 2px #3b82f6; z-index: 10; }
-        .component-wrapper.drag-over { background-color: rgba(59, 130, 246, 0.05); outline: 2px dashed #3b82f6; outline-offset: -2px; }
-        
-        .controls-overlay { pointer-events: none; }
-        .controls-actions { pointer-events: auto; }
-        
-        /* Transition for canvas root */
-        .canvas-root { min-height: 100%; transition: all 0.3s ease; }
-        
-        /* Inject local variables for preview */
-        ${getSubStyles(components).join("\n")}
-      `}</style>
     </div>
   );
 };

@@ -16,6 +16,9 @@ import {
 } from "lucide-react";
 import { useCallback, useState } from "react";
 
+const BACKEND_URL =
+  process.env.NEXT_PUBLIC_BACKEND_URL ?? "http://localhost:5004";
+
 // NEW: Import Sandpack components
 import {
     SandpackCodeEditor,
@@ -37,6 +40,13 @@ function ComponentPreview({ code }: { code: string }) {
         .replace(/"use client";\s*/g, "")
         .replace(/'use client';\s*/g, "")
         .replace(/use client;\s*/g, "");
+
+      // AI often adds import React; Sandpack template already imports React (duplicate = error)
+      for (let i = 0; i < 40; i++) {
+        const before = cleanCode;
+        cleanCode = cleanCode.replace(/^import\s[\s\S]*?;\s*\r?\n?/m, "");
+        if (cleanCode === before) break;
+      }
 
       // Remove export statements
       cleanCode = cleanCode.replace(/export\s+default\s+/g, "");
@@ -434,6 +444,8 @@ export default function ComponentGeneratorApp() {
     message: string;
     type: "success" | "error";
   } | null>(null);
+  /** Groq cloud vs local Ollama agent (backend must reach Ollama on the server machine). */
+  const [generateMode, setGenerateMode] = useState<"groq" | "ollama">("groq");
 
   const getConvertedCode = (rawCode: string) => {
     if (codeLang === 'html') return convertJSXtoHTML(rawCode);
@@ -470,16 +482,17 @@ export default function ComponentGeneratorApp() {
     setError("");
 
     try {
-      const response = await fetch(
-        "http://localhost:5004/api/generate-component",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ prompt }),
+      const path =
+        generateMode === "ollama"
+          ? "/api/generate-component-agent"
+          : "/api/generate-component";
+      const response = await fetch(`${BACKEND_URL}${path}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
         },
-      );
+        body: JSON.stringify({ prompt }),
+      });
 
       if (!response.ok) {
         console.error("❌ Response not OK");
@@ -608,6 +621,40 @@ export default function ComponentGeneratorApp() {
 
               <div className="space-y-5">
                 <div>
+                  <span className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                    Model backend
+                  </span>
+                  <div className="flex flex-col gap-2 text-sm">
+                    <label className="flex items-center gap-2 cursor-pointer text-gray-700 dark:text-gray-300">
+                      <input
+                        type="radio"
+                        name="gen-mode"
+                        checked={generateMode === "groq"}
+                        onChange={() => setGenerateMode("groq")}
+                        disabled={loading}
+                        className="accent-gray-900 dark:accent-gray-100"
+                      />
+                      Groq (cloud) — needs{" "}
+                      <code className="text-xs bg-gray-100 dark:bg-gray-800 px-1 rounded">
+                        GROQ_API_KEY
+                      </code>{" "}
+                      on the backend
+                    </label>
+                    <label className="flex items-center gap-2 cursor-pointer text-gray-700 dark:text-gray-300">
+                      <input
+                        type="radio"
+                        name="gen-mode"
+                        checked={generateMode === "ollama"}
+                        onChange={() => setGenerateMode("ollama")}
+                        disabled={loading}
+                        className="accent-gray-900 dark:accent-gray-100"
+                      />
+                      Local Ollama (agent) — backend calls Ollama on the same machine; can take several minutes
+                    </label>
+                  </div>
+                </div>
+
+                <div>
                   <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
                     Describe Your Component
                   </label>
@@ -648,7 +695,9 @@ export default function ComponentGeneratorApp() {
                   {loading ? (
                     <>
                       <Loader2 className="w-5 h-5 animate-spin" />
-                      Generating...
+                      {generateMode === "ollama"
+                        ? "Generating (Ollama)…"
+                        : "Generating…"}
                     </>
                   ) : (
                     <>

@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start",
+    "start": "kill -9 $(lsof -t -i:3000) 2>/dev/null || true && npm run dev",
     "lint": "eslint",
     "storybook": "start-storybook -p 6006",
     "build-storybook": "build-storybook -o .out-storybook",

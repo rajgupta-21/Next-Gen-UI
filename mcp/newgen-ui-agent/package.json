@@ -1,0 +1,27 @@
+{
+  "name": "newgen-ui-mcp-agent",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "bin": {
+    "newgen-ui-mcp": "./dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "node --import tsx src/index.ts",
+    "smoke": "npm run build && NEWGEN_AGENT_VERBOSE=1 node scripts/smoke-agent.mjs"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.12.1",
+    "zod": "^3.24.2"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

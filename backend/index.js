@@ -46,6 +46,9 @@ app.get("/", (req, res) => {
 app.listen(PORT, () => {
   console.log(`Backend running on http://localhost:${PORT}`);
   console.log(
-    ` Component generator endpoint: http://localhost:${PORT}/api/generate-component`,
+    ` Component generator (Groq): http://localhost:${PORT}/api/generate-component`,
+  );
+  console.log(
+    ` Ollama agent: http://localhost:${PORT}/api/generate-component-agent`,
   );
 });
